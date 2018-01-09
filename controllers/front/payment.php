@@ -23,40 +23,5 @@ class PayBearPaymentModuleFrontController extends ModuleFrontController
         ]);
 
         $this->setTemplate('module:paybear/views/templates/front/payment.tpl');
-
-
-        // $this->ajax = true;
-        // $sdk = new PayBearSDK($this->context);
-        //
-        // // $orderId = (int) $_GET['order'];
-        // $orderId = 123;
-        // $fiatTotal = 19.99; //get from order
-        //
-        // $tokens = ['ETH', 'BTC', 'LTC', 'BCH', 'BTG', 'DASH'];
-        //
-        //
-        // if (isset($_GET['token'])) {
-        //     $token = $_GET['token'];
-        //     $data = $sdk->getCurrency($token, $orderId, true);
-        // } else {
-        //     $data = [];
-        //     foreach ($tokens as $token) {
-        //         $enabled = Configuration::get('paybear_enable_'.strtolower($token));
-        //         $wallet = Configuration::get('paybear_' . strtolower($token) . '_wallet');
-        //         $confirmations = Configuration::get('paybear_' . strtolower($token) . '_confirmations');
-        //
-        //         if (!$enabled || !$wallet || !$confirmations) {
-        //             continue;
-        //         }
-        //
-        //         $currency = $sdk->getCurrency($token, $orderId);
-        //         if ($currency) {
-        //             $data[] = $currency;
-        //         }
-        //     }
-        // }
-        //
-        // echo Tools::jsonEncode($data);
-        // die();
     }
 }

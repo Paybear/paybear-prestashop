@@ -34,6 +34,8 @@ include_once 'classes/PaybearData.php';
 
 class PayBear extends PaymentModule
 {
+    const DEBUG_MODE = true; // todo change
+
     protected $_html = '';
     protected $_postErrors = array();
 
@@ -41,6 +43,8 @@ class PayBear extends PaymentModule
     public $owner;
     public $address;
     public $extra_mail_vars;
+
+
 
     protected $cryptoCurrencies = array(
         array('name' => 'eth', 'label' => 'ETH', 'defaults' => array('enabled' => 1, 'confirmations' => 3)),
@@ -55,7 +59,7 @@ class PayBear extends PaymentModule
     {
         $this->name = 'paybear';
         $this->tab = 'payments_gateways';
-        $this->version = '0.1.0';
+        $this->version = '0.2.0';
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
         $this->author = 'PayBear';
         $this->controllers = array('validation', 'currencies', 'payment', 'callback', 'status');
@@ -66,6 +70,9 @@ class PayBear extends PaymentModule
 
         $this->bootstrap = true;
         parent::__construct();
+
+        // $this->displayName = Configuration::get('PAYBEAR_TITLE');
+        // $this->description = Configuration::get('PAYBEAR_DESCRIPTION');
 
         $this->displayName = $this->l('Crypto Payment Gateway for PrestaShop by PayBear.io');
         $this->description = $this->l('Allows to accept crypto payments such as Bitcoin (BTC) and Ethereum (ETH)');
@@ -98,6 +105,11 @@ class PayBear extends PaymentModule
         }
 
         // todo: set default config
+
+        Configuration::updateValue('PAYBEAR_TITLE', 'Crypto Payments');
+        Configuration::updateValue('PAYBEAR_DESCRIPTION', 'Bitcoin (BTC), Ethereum (ETH) and other crypto currencies');
+        Configuration::updateValue('PAYBEAR_EXCHANGE_LOCKTIME', '15');
+
         foreach ($this->cryptoCurrencies as $cryptoCurrency) {
             if (!Configuration::updateValue('PAYBEAR_ENABLE_'.strtoupper($cryptoCurrency['name']), $cryptoCurrency['defaults']['enabled'])) {
                 return false;
@@ -161,9 +173,9 @@ class PayBear extends PaymentModule
         $embeddedOption = new PaymentOption();
         $embeddedOption
             ->setModuleName($this->name)
-            ->setCallToActionText($this->trans('Pay by Crypto (Embedded)'))
+            ->setCallToActionText(Configuration::get('PAYBEAR_TITLE'))
             ->setAction($this->context->link->getModuleLink($this->name, 'validation', array(), true))
-            ->setAdditionalInformation($this->context->smarty->fetch('module:paybear/views/templates/front/payment_infos.tpl'))
+            ->setAdditionalInformation(Configuration::get('PAYBEAR_DESCRIPTION'))
             // ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/crypto.png'))
         ;
 
@@ -204,7 +216,24 @@ class PayBear extends PaymentModule
             )
         );
 
-        $fields_form[0]['form']['input'] = array();
+        $fields_form[0]['form']['input'] = array(
+            array(
+                'type' => 'text',
+                'label' => 'Title',
+                'name' => 'paybear_title',
+            ),
+            array(
+                'type' => 'textarea',
+                'label' => 'Description',
+                'name' => 'paybear_description'
+            ),
+            array(
+                'type' => 'text',
+                'label' => 'Exchange Rate Lock Time',
+                'name' => 'paybear_exchange_locktime',
+                'desc' => 'Lock Fiat to Crypto exchange rate for this long (in minutes, 15 is the recommended minimum)'
+            )
+        );
 
         foreach ($this->cryptoCurrencies as $currency) {
             $fields_form[0]['form']['input'][] = array(
@@ -268,6 +297,9 @@ class PayBear extends PaymentModule
         );
 
         // Load current value
+        $helper->fields_value['paybear_title'] = Configuration::get('PAYBEAR_TITLE');
+        $helper->fields_value['paybear_description'] = Configuration::get('PAYBEAR_DESCRIPTION');
+        $helper->fields_value['paybear_exchange_locktime'] = Configuration::get('PAYBEAR_EXCHANGE_LOCKTIME');
         foreach ($this->cryptoCurrencies as $currency) {
             $helper->fields_value['paybear_enable_' . $currency['name']] = Configuration::get('PAYBEAR_ENABLE_' . strtoupper($currency['name']));
             $helper->fields_value['paybear_' . $currency['name'] . '_confirmations'] = Configuration::get('PAYBEAR_' . strtoupper($currency['name']) . '_CONFIRMATIONS');
@@ -287,6 +319,7 @@ class PayBear extends PaymentModule
               `token` VARCHAR(256) NULL DEFAULT NULL,
               `address` VARCHAR(256),
               `invoice` VARCHAR(256),
+              `amount` DECIMAL(20, 7),
               `confirmations` INT(2) NULL DEFAULT NULL,
               `date_add` DATETIME NULL DEFAULT NULL,
               `date_upd` DATETIME NULL DEFAULT NULL

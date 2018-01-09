@@ -13,6 +13,11 @@ class PayBearSDK
     public function getAddress($orderId, $token = 'ETH')
     {
         $data = PaybearData::getByOrderRefence($orderId);
+        /** @var Order $order */
+        $order = Order::getByReference($orderId)->getFirst();
+
+        $rate = $this->getRate($token);
+
         if ($data && strtolower($data->token) == strtolower($token)) {
             return $data->address;
         } elseif (!$data) {
@@ -28,10 +33,14 @@ class PayBearSDK
             $response = json_decode($response);
 
             if (isset($response->data->address)) {
+                $fiatAmount = $order->total_paid;
+                $coinsAmount = round($fiatAmount / $rate, 7);
+
                 $data->confirmations = null;
                 $data->token = strtolower($token);
                 $data->address = $response->data->address;
                 $data->invoice = $response->data->invoice;
+                $data->amount = $coinsAmount;
 
                 if ($data->id_paybear) {
                     $data->update();
@@ -60,7 +69,7 @@ class PayBearSDK
             /** @var Order $order */
             $order = Order::getByReference($orderReference)->getFirst();
             $fiatValue = (float)$order->total_paid;
-            $coinsValue = round($fiatValue / $rate, 5);
+            $coinsValue = round($fiatValue / $rate, 7);
 
             switch ($token) {
                 case 'ETH':
@@ -89,7 +98,7 @@ class PayBearSDK
                         'blockExplorer' => 'https://blockchain.info/address/%s',
                         'minimum'       => 0.0005,
                         'min_with_fee'  => 0.001,
-                        'walletLink'    => "bitcoin:%s?amount=%s"
+                        // 'walletLink'    => "bitcoin:%s?amount=%s"
                     ];
                     break;
                 case 'DASH':

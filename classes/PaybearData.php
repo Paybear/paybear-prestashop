@@ -13,6 +13,8 @@ class PaybearData extends ObjectModel
 
     public $invoice;
 
+    public $amount;
+
     public $date_add;
 
     public $date_upd;
@@ -32,6 +34,7 @@ class PaybearData extends ObjectModel
             'confirmations' => array('type' => self::TYPE_INT, 'required' => false, 'validate' => false, 'allow_null' => true),
             'address' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'invoice' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'required' => true),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
         )
