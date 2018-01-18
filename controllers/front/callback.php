@@ -43,8 +43,10 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
                     $orderTimestamp = strtotime($order->date_add);
                     $paymentTimestamp = time();
                     $deadline = $orderTimestamp + Configuration::get('PAYBEAR_EXCHANGE_LOCKTIME') * 60;
+                    $orderStatus = Configuration::get('PS_OS_PAYMENT');
 
                     if ($paymentTimestamp > $deadline) {
+                        $orderStatus = Configuration::get('PS_OS_ERROR');
                         PrestaShopLogger::addLog('PayBear: late payment', 1, null, 'Order', $order->id, true);
 
                         $fiatPaid = $amountPaid * $sdk->getRate($params->blockchain);
