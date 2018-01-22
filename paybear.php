@@ -94,34 +94,30 @@ class PayBear extends PaymentModule
             return false;
         }
 
-
         if (!parent::install()
             || !$this->registerHook('paymentOptions')
             || !$this->registerHook('paymentReturn')
             || !$this->registerHook('header')
-            // || !$this->registerHook('displayPaymentByBinaries')
         ) {
             return false;
         }
-
-        // todo: set default config
 
         Configuration::updateValue('PAYBEAR_TITLE', 'Crypto Payments');
         Configuration::updateValue('PAYBEAR_DESCRIPTION', 'Bitcoin (BTC), Ethereum (ETH) and other crypto currencies');
         Configuration::updateValue('PAYBEAR_EXCHANGE_LOCKTIME', '15');
 
-        foreach ($this->cryptoCurrencies as $cryptoCurrency) {
-            if (!Configuration::updateValue('PAYBEAR_ENABLE_'.strtoupper($cryptoCurrency['name']), $cryptoCurrency['defaults']['enabled'])) {
-                return false;
-            }
-            if (!Configuration::updateValue('PAYBEAR_' . strtoupper($cryptoCurrency['name']) . '_CONFIRMATIONS', $cryptoCurrency['defaults']['confirmations'])) {
-                return false;
-            }
-
-            if (!Configuration::updateValue('PAYBEAR_' . strtoupper($cryptoCurrency['name']) . '_WALLET', '')) {
-                return false;
-            }
-        }
+        // foreach ($this->cryptoCurrencies as $cryptoCurrency) {
+        //     if (!Configuration::updateValue('PAYBEAR_ENABLE_'.strtoupper($cryptoCurrency['name']), $cryptoCurrency['defaults']['enabled'])) {
+        //         return false;
+        //     }
+        //     if (!Configuration::updateValue('PAYBEAR_' . strtoupper($cryptoCurrency['name']) . '_CONFIRMATIONS', $cryptoCurrency['defaults']['confirmations'])) {
+        //         return false;
+        //     }
+        //
+        //     if (!Configuration::updateValue('PAYBEAR_' . strtoupper($cryptoCurrency['name']) . '_WALLET', '')) {
+        //         return false;
+        //     }
+        // }
 
         return true;
     }
@@ -219,6 +215,7 @@ class PayBear extends PaymentModule
         $fields_form[0]['form']['input'] = array(
             array(
                 'type' => 'text',
+                'required' => true,
                 'label' => 'Title',
                 'name' => 'paybear_title',
             ),
@@ -229,42 +226,23 @@ class PayBear extends PaymentModule
             ),
             array(
                 'type' => 'text',
+                'required' => true,
+                'label' => 'API Key (Secret)',
+                'name' => 'paybear_api_secret'
+            ),
+            array(
+                'type' => 'text',
+                'required' => true,
+                'label' => 'API Key (Public)',
+                'name' => 'paybear_api_public'
+            ),
+            array(
+                'type' => 'text',
                 'label' => 'Exchange Rate Lock Time',
                 'name' => 'paybear_exchange_locktime',
                 'desc' => 'Lock Fiat to Crypto exchange rate for this long (in minutes, 15 is the recommended minimum)'
-            )
+            ),
         );
-
-        foreach ($this->cryptoCurrencies as $currency) {
-            $fields_form[0]['form']['input'][] = array(
-                'type' => 'switch',
-                'label' => $this->l('Enable ' . $currency['label']),
-                'name' => 'paybear_enable_' . $currency['name'],
-                'values' => array(
-                    array(
-                        'id' => 'active_on',
-                        'value' => 1,
-                        'label' => $this->l('Yes'),
-                    ),
-                    array(
-                        'id' => 'active_off',
-                        'value' => 0,
-                        'label' => $this->l('No'),
-                    )
-                ),
-            );
-
-            $fields_form[0]['form']['input'][] = array(
-                'type' => 'text',
-                'label' => $this->l($currency['label'] . ' Confirmations'),
-                'name' => 'paybear_'.$currency['name'].'_confirmations',
-            );
-            $fields_form[0]['form']['input'][] = array(
-                'type' => 'text',
-                'label' => $this->l( $currency['label'] . ' Payout wallet'),
-                'name' => 'paybear_'.$currency['name'].'_wallet',
-            );
-        }
 
         $helper = new HelperForm();
 
@@ -300,11 +278,13 @@ class PayBear extends PaymentModule
         $helper->fields_value['paybear_title'] = Configuration::get('PAYBEAR_TITLE');
         $helper->fields_value['paybear_description'] = Configuration::get('PAYBEAR_DESCRIPTION');
         $helper->fields_value['paybear_exchange_locktime'] = Configuration::get('PAYBEAR_EXCHANGE_LOCKTIME');
-        foreach ($this->cryptoCurrencies as $currency) {
-            $helper->fields_value['paybear_enable_' . $currency['name']] = Configuration::get('PAYBEAR_ENABLE_' . strtoupper($currency['name']));
-            $helper->fields_value['paybear_' . $currency['name'] . '_confirmations'] = Configuration::get('PAYBEAR_' . strtoupper($currency['name']) . '_CONFIRMATIONS');
-            $helper->fields_value['paybear_' . $currency['name'] . '_wallet'] = Configuration::get('PAYBEAR_' . strtoupper($currency['name']) . '_WALLET');
-        }
+        $helper->fields_value['paybear_api_secret'] = Configuration::get('PAYBEAR_API_SECRET');
+        $helper->fields_value['paybear_api_public'] = Configuration::get('PAYBEAR_API_PUBLIC');
+        // foreach ($this->cryptoCurrencies as $currency) {
+        //     $helper->fields_value['paybear_enable_' . $currency['name']] = Configuration::get('PAYBEAR_ENABLE_' . strtoupper($currency['name']));
+        //     $helper->fields_value['paybear_' . $currency['name'] . '_confirmations'] = Configuration::get('PAYBEAR_' . strtoupper($currency['name']) . '_CONFIRMATIONS');
+        //     $helper->fields_value['paybear_' . $currency['name'] . '_wallet'] = Configuration::get('PAYBEAR_' . strtoupper($currency['name']) . '_WALLET');
+        // }
 
         return $helper->generateForm($fields_form);
     }

@@ -16,6 +16,8 @@ class PayBearSDK
         /** @var Order $order */
         $order = Order::getByReference($orderId)->getFirst();
 
+        $apiSecret = Configuration::get('PAYBEAR_API_SECRET');
+
         $rate = $this->getRate($token);
 
         if ($data && strtolower($data->token) == strtolower($token)) {
@@ -25,10 +27,11 @@ class PayBearSDK
             $data->order_reference = $orderId;
         }
 
-        $payoutAddress = $this->getPayout($token);
+        // $payoutAddress = $this->getPayout($token);
         $callbackUrl = $this->context->link->getModuleLink('paybear', 'callback', array('order' => $orderId));
 
-        $url = sprintf('https://api.paybear.io/v1/%s/payment/%s/%s', strtolower($token), $payoutAddress, urlencode($callbackUrl));
+        // $url = sprintf('https://api.paybear.io/v2/%s/payment/%s/%s', strtolower($token), $payoutAddress, urlencode($callbackUrl));
+        $url = sprintf('http://s.etherbill.io/v2/%s/payment/%s?token=%s', strtolower($token), urlencode($callbackUrl), $apiSecret);
         if ($response = file_get_contents($url)) {
             $response = json_decode($response);
 
@@ -199,7 +202,7 @@ class PayBearSDK
         static $rates = null;
 
         if (empty($rates)) {
-            $url = "https://api.paybear.io/v1/exchange/usd/rate";
+            $url = "http://s.etherbill.io/v2/exchange/usd/rate";
 
             if ($response = file_get_contents($url)) {
                 $response = json_decode($response);

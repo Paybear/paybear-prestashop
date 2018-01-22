@@ -36,14 +36,14 @@
                                 </div>
                             </div>
                             <div class="PayBear__brand-link" style="display: none;">
-                            <span>
-                                Powered by <a href="https://www.paybear.io" target="_blank" rel="noopener noreferrer">
-                                PayBear.io<svg height="14" viewBox="0 0 14 14" width="14" xmlns="http://www.w3.org/2000/svg"
-                                               class="PayBear__Nav__external">
-                                <path d="m333.875 38c-.482562 0-.875-.392-.875-.875v-12.25c0-.483.392438-.875.875-.875h5.6875c.241938 0 .4375.1955625.4375.4375v.875c0 .2419375-.195562.4375-.4375.4375h-4.8125v10.5h10.5v-4.8125c0-.2419375.195562-.4375.4375-.4375h.875c.241938 0 .4375.1955625.4375.4375v5.6875c0 .483-.392438.875-.875.875zm12.690554-14c .240249 0 .434446.1933285.434446.4344461v4.3444615c0 .1746474-.10557.3340891-.268053.4005594-.053872.0230256-.11035.0338868-.166393.0338868-.112956 0-.224174-.0443135-.307154-.1272927l-1.557489-1.5579239-4.344027 4.3444615c-.169869.1698684-.444438.1698684-.615176 0l-.614307-.6143069c-.169868-.1698684-.169868-.4444384 0-.6143068l4.344462-4.3444615-1.557924-1.5579239c-.124252-.1246861-.161614-.3114979-.094275-.4735463.066905-.1629173.225912-.2680533.401428-.2680533z"
-                                      fill="#b9b9b9" transform="translate(-333 -24)"></path>
-                                </svg></a>
-                            </span>
+                        <span>
+                            Powered by <a href="https://www.paybear.io" target="_blank" rel="noopener noreferrer">
+                            PayBear.io<svg height="14" viewBox="0 0 14 14" width="14" xmlns="http://www.w3.org/2000/svg"
+                                           class="PayBear__Nav__external">
+                            <path d="m333.875 38c-.482562 0-.875-.392-.875-.875v-12.25c0-.483.392438-.875.875-.875h5.6875c.241938 0 .4375.1955625.4375.4375v.875c0 .2419375-.195562.4375-.4375.4375h-4.8125v10.5h10.5v-4.8125c0-.2419375.195562-.4375.4375-.4375h.875c.241938 0 .4375.1955625.4375.4375v5.6875c0 .483-.392438.875-.875.875zm12.690554-14c .240249 0 .434446.1933285.434446.4344461v4.3444615c0 .1746474-.10557.3340891-.268053.4005594-.053872.0230256-.11035.0338868-.166393.0338868-.112956 0-.224174-.0443135-.307154-.1272927l-1.557489-1.5579239-4.344027 4.3444615c-.169869.1698684-.444438.1698684-.615176 0l-.614307-.6143069c-.169868-.1698684-.169868-.4444384 0-.6143068l4.344462-4.3444615-1.557924-1.5579239c-.124252-.1246861-.161614-.3114979-.094275-.4735463.066905-.1629173.225912-.2680533.401428-.2680533z"
+                                  fill="#b9b9b9" transform="translate(-333 -24)"></path>
+                            </svg></a>
+                        </span>
                             </div>
                         </div>
                         <!-- Select currency -->
@@ -63,14 +63,14 @@
                                 <!-- First payment step -->
                                 <div class="P-Payment__start">
                                     <div class="P-Payment__value">
-                                    <span class="P-Payment__value__icon">
-                                        <img src="#">
-                                    </span>
+                                <span class="P-Payment__value__icon">
+                                    <img src="">
+                                </span>
                                         <span class="P-Payment__value__pay">PAY <span class="P-Payment__value__coins"></span></span>
                                     </div>
                                     <div class="P-Tabs" id="paybear-tabs">
                                         <ul class="P-Tabs__Tab-list P-Tabs__Tab-list--second">
-                                            <li role="tab" class="P-Tabs__Tab">Wallet</li>
+                                            <li role="tab" class="P-Tabs__Tab P-Tabs__Tab--wallet">Wallet</li>
                                             <li role="tab" class="P-Tabs__Tab P-Tabs__Tab--selected">Copy</li>
                                             <li role="tab" class="P-Tabs__Tab">Scan</li>
                                         </ul>
@@ -78,13 +78,13 @@
                                             <div class="P-Payment__address__text">---</div>
                                             <code>---</code>
                                         </div>
-                                        <div class="P-Tabs__Tab-panel">
+                                        <div class="P-Tabs__Tab-panel P-Tabs__Tab-panel--wallet">
                                             <div>
                                                 <a href="#" class="P-btn-block P-wallet-btn">
-                                                <span class="P-btn-block__inner">
-                                                    <i class="P-wallet-icon"></i>
-                                                    <span class="P-btn-block__text">Open in Wallet</span>
-                                                </span>
+                                            <span class="P-btn-block__inner">
+                                                <i class="P-wallet-icon"></i>
+                                                <span class="P-btn-block__text">Open in Wallet</span>
+                                            </span>
                                                 </a>
                                             </div>
                                         </div>
@@ -92,24 +92,24 @@
                                         <div class="P-Tabs__Tab-panel P-Tabs__Tab-panel--selected">
                                             <div class="P-buttons-flex">
                                                 <a class="P-btn-block P-btn-copy-address">
-                                                <span class="P-btn-block__copied-text">
-                                                    <svg height="11" viewBox="0 0 13 11" width="13" xmlns="http://www.w3.org/2000/svg"><path d="m4.42775177 7.85005539 5.97311463-5.97311463c.5359766-.53597656 1.4049663-.53597656 1.9409428 0 .5359766.53597657.5359766 1.40496628 0 1.94094285l-6.93193869 6.93193869c-.5029721.5029721-1.29920739.5339442-1.83829672.0929164-.06892267-.0472373-.13449273-.1014683-.19571746-.1626931l-2.71766557-2.71766553c-.53597656-.53597657-.53597656-1.40496628 0-1.94094285.53597657-.53597656 1.40496628-.53597656 1.94094285 0z" fill-rule="evenodd" fill="#4FBDA6" transform="translate(0 -1)"/></svg>
-                                                    Copied to Clipboard!
-                                                </span>
+                                            <span class="P-btn-block__copied-text">
+                                                <svg height="11" viewBox="0 0 13 11" width="13" xmlns="http://www.w3.org/2000/svg"><path d="m4.42775177 7.85005539 5.97311463-5.97311463c.5359766-.53597656 1.4049663-.53597656 1.9409428 0 .5359766.53597657.5359766 1.40496628 0 1.94094285l-6.93193869 6.93193869c-.5029721.5029721-1.29920739.5339442-1.83829672.0929164-.06892267-.0472373-.13449273-.1014683-.19571746-.1626931l-2.71766557-2.71766553c-.53597656-.53597657-.53597656-1.40496628 0-1.94094285.53597657-.53597656 1.40496628-.53597656 1.94094285 0z" fill-rule="evenodd" fill="#4FBDA6" transform="translate(0 -1)"/></svg>
+                                                Copied to Clipboard!
+                                            </span>
                                                     <span class="P-btn-block__inner">
-                                                    <span class="P-btn-block__helper">--</span>
-                                                    Copy Address
-                                                </span>
+                                                <span class="P-btn-block__helper">--</span>
+                                                Copy Address
+                                            </span>
                                                 </a>
                                                 <a class="P-btn-block P-Payment__value__copy">
-                                                <span class="P-btn-block__copied-text">
-                                                    <svg height="11" viewBox="0 0 13 11" width="13" xmlns="http://www.w3.org/2000/svg"><path d="m4.42775177 7.85005539 5.97311463-5.97311463c.5359766-.53597656 1.4049663-.53597656 1.9409428 0 .5359766.53597657.5359766 1.40496628 0 1.94094285l-6.93193869 6.93193869c-.5029721.5029721-1.29920739.5339442-1.83829672.0929164-.06892267-.0472373-.13449273-.1014683-.19571746-.1626931l-2.71766557-2.71766553c-.53597656-.53597657-.53597656-1.40496628 0-1.94094285.53597657-.53597656 1.40496628-.53597656 1.94094285 0z" fill-rule="evenodd" fill="#4FBDA6" transform="translate(0 -1)"/></svg>
-                                                    Copied to Clipboard!
-                                                </span>
+                                            <span class="P-btn-block__copied-text">
+                                                <svg height="11" viewBox="0 0 13 11" width="13" xmlns="http://www.w3.org/2000/svg"><path d="m4.42775177 7.85005539 5.97311463-5.97311463c.5359766-.53597656 1.4049663-.53597656 1.9409428 0 .5359766.53597657.5359766 1.40496628 0 1.94094285l-6.93193869 6.93193869c-.5029721.5029721-1.29920739.5339442-1.83829672.0929164-.06892267-.0472373-.13449273-.1014683-.19571746-.1626931l-2.71766557-2.71766553c-.53597656-.53597657-.53597656-1.40496628 0-1.94094285.53597657-.53597656 1.40496628-.53597656 1.94094285 0z" fill-rule="evenodd" fill="#4FBDA6" transform="translate(0 -1)"/></svg>
+                                                Copied to Clipboard!
+                                            </span>
                                                     <span class="P-btn-block__inner">
-                                                    <span class="P-btn-block__helper">--</span>
-                                                    Copy Amount
-                                                </span>
+                                                <span class="P-btn-block__helper">--</span>
+                                                Copy Amount
+                                            </span>
                                                 </a>
                                             </div>
                                         </div>
@@ -125,18 +125,15 @@
                                 <!-- Payment expired step -->
                                 <div class="P-Payment__expired" style="display: none;">
                                     <div class="P-Content">
-                                        <div class="P-Content__icon">
-                                            <img src="data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjI5OC4zMjUxIiB2aWV3Qm94PSIwIDAgMjk4LjMyNTEgMjk4LjMyNTEiIHdpZHRoPSIyOTguMzI1MSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0zOSAtMzcuMzM3MTQ3KSI+PGcgZmlsbC1ydWxlPSJub256ZXJvIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzOSA1NykiPjxwYXRoIGQ9Im0yNzguNzc0MTkgMjU4Ljk5ODhoLTI1OS41NDgzODNjLTEwLjYxODA1MyAwLTE5LjIyNTgwNy04LjU4ODk3LTE5LjIyNTgwNy0xOS4xODUxOCAwLTIuOTQ4NTMgMC0xNC44MTM2MiAxLTEwLjgxMzYyIDIuMzQ0NTEwMiA5LjM3ODA0IDEwLjU2MjUyNS0xOC4zNzE1NyAxOC4yMjU4MDctMTguMzcxNTdoMjU5LjU0ODM4M2M4LjMzMzA1IDAgMTYuNTU4MDggNi4zMjIxMyAxOS4yMjU4MSAxNi4zNzE1Ny43MzE1MiAyLjc1NTY2IDAgMTAuNTMzNDQgMCAxMi44MTM2MiAwIDEwLjU5NjIxLTguNjA3NzUgMTkuMTg1MTgtMTkuMjI1ODEgMTkuMTg1MTh6IiBmaWxsPSIjY2Q0MTJkIi8+PHBhdGggZD0ibTEzNC42MDQwOCA5LjYzNDU2MDJjOC4yNjc2OS0xMi4zNjU0NTE0IDE5LjkxNTUzLTEzLjMxNjMxNzEgMjguODA1NjYgMGwxMjkuNTk0NTUgMjA2LjEwODgzOThjOS42MDMyOSAxNC4zNzAzMSA0Ljc5Njg0IDI0LjA3MDIyLTkuNjAyNjkgMjQuMDcwMjJoLTI2OC44MDU2MDhjLTE0LjQwMDcyOTkgMC0xOS4yMDIzNzUxLTkuNzAxMTEtOS42MDA4ODcyLTI0LjA3MDIyeiIgZmlsbD0iI2YwNWY1MCIvPjwvZz48cGF0aCBkPSJtMTc3LjcwMTMgMjE4Ljk4ODQxaDE3LjU1NDQ3YzIuNjg1MDMgMCA0Ljg5MDctMi4xMjA2OCA0Ljk5NjE0LTQuODAzNjRsMy4zNDAxNi04NC45ODg0MWMuMTA4NDQtMi43NTkzLTIuMDQwNS01LjA4NDA2LTQuNzk5NzktNS4xOTI1LS4wNjU0LS4wMDMtLjEzMDg4LS4wMDQtLjE5NjM1LS4wMDRoLTI0LjIzNDc4Yy0yLjc2MTQzIDAtNSAyLjIzODU4LTUgNSAwIC4wNjU1LjAwMS4xMzA5NC4wMDQuMTk2MzZsMy4zNDAxNiA4NC45ODg0MWMuMTA1NDQgMi42ODI5NiAyLjMxMTExIDQuODAzNjQgNC45OTYxNCA0LjgwMzY0em0tMTEuMDI5MyAzMC40ODc1NWMwIDExLjE5OTUxIDguOTE4MTMgMTkuMjg4MDQgMTkuNDk1NDQgMTkuMjg4MDQgMTAuNzg0NzEgMCAxOS45MTAyMy04LjA4ODUzIDE5LjkxMDIzLTE5LjI4ODA0IDAtMTAuOTkyMTEtOS4xMjU1Mi0xOC44NzMyNC0xOS45MTAyMy0xOC44NzMyNC0xMC41NzczMSAwLTE5LjQ5NTQ0IDcuODgxMTMtMTkuNDk1NDQgMTguODczMjR6IiBmaWxsPSIjZmZmIi8+PC9nPjwvc3ZnPg==">
-                                        </div>
-                                        <h2>Payment Window Expired</h2>
                                         <p>
-                                            Not to worry, simply go back and start the process
-                                            the same way you did before
+                                            <strong>Your payment window has expired.</strong>
+                                            Hit the Refresh button below to lock in
+                                            a new exchange rate and start again.
                                         </p>
                                         <div>
                                             <a href="/" class="P-btn">
-                                                <i class="P-btn__icon P-btn__icon--back"></i>
-                                                Back to Cart
+                                                <i class="P-btn__icon P-btn__icon--refresh-white"></i>
+                                                Refresh
                                             </a>
                                         </div>
                                         <button class="P-Payment__helper">What's a payment window?</button>
@@ -299,15 +296,16 @@
                                                 </g>
                                             </svg>
                                         </div>
-                                        <h2>Payment Detected</h2>
-                                        <p class="P-confirmations">
-                                            ---
+                                        <h2 class="P-confirmations">---</h2>
+                                        <p>
+                                            <strong>Your order will be processed soon.</strong>
+                                            You can leave this tab open until your payment is confirmed,
+                                            <strong>or</strong> close it and wait for a confirmation email.
                                         </p>
-                                        <p>You can freely close this window now!</p>
                                         <div>
-                                            <button class="P-btn">
-                                                <i class="P-btn__icon P-btn__icon--back"></i>
-                                                Back to Cart
+                                            <button class="P-btn P-btn--sm">
+                                                <i class="P-btn__icon--close"></i>
+                                                Close
                                             </button>
                                         </div>
                                         <button class="P-Payment__helper">What does this mean?</button>
