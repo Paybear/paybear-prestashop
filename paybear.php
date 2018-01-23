@@ -1,28 +1,4 @@
 <?php
-/*
-* 2007-2015 PrestaShop
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
-*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
-*/
 
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
@@ -34,8 +10,6 @@ include_once 'classes/PaybearData.php';
 
 class PayBear extends PaymentModule
 {
-    const DEBUG_MODE = true; // todo change
-
     protected $_html = '';
     protected $_postErrors = array();
 
@@ -43,17 +17,6 @@ class PayBear extends PaymentModule
     public $owner;
     public $address;
     public $extra_mail_vars;
-
-
-
-    protected $cryptoCurrencies = array(
-        array('name' => 'eth', 'label' => 'ETH', 'defaults' => array('enabled' => 1, 'confirmations' => 3)),
-        array('name' => 'btc', 'label' => 'BTC', 'defaults' => array('enabled' => 1, 'confirmations' => 1)),
-        array('name' => 'bch', 'label' => 'BCH', 'defaults' => array('enabled' => 0, 'confirmations' => 3)),
-        array('name' => 'btg', 'label' => 'BTG', 'defaults' => array('enabled' => 0, 'confirmations' => 3)),
-        array('name' => 'dash', 'label' => 'DASH', 'defaults' => array('enabled' => 1, 'confirmations' => 3)),
-        array('name' => 'ltc', 'label' => 'LTC', 'defaults' => array('enabled' => 1, 'confirmations' => 3)),
-    );
 
     public function __construct()
     {
@@ -71,12 +34,8 @@ class PayBear extends PaymentModule
         $this->bootstrap = true;
         parent::__construct();
 
-        // $this->displayName = Configuration::get('PAYBEAR_TITLE');
-        // $this->description = Configuration::get('PAYBEAR_DESCRIPTION');
-
         $this->displayName = $this->l('Crypto Payment Gateway for PrestaShop by PayBear.io');
         $this->description = $this->l('Allows to accept crypto payments such as Bitcoin (BTC) and Ethereum (ETH)');
-        // $this->module_link = $this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 
         if (!count(Currency::checkPaymentCurrencies($this->id))) {
             $this->warning = $this->l('No currency has been set for this module.');
@@ -85,7 +44,6 @@ class PayBear extends PaymentModule
 
     public function install()
     {
-        // Registration order status
         if (!$this->installOrderState()) {
             return false;
         }
@@ -105,19 +63,6 @@ class PayBear extends PaymentModule
         Configuration::updateValue('PAYBEAR_TITLE', 'Crypto Payments');
         Configuration::updateValue('PAYBEAR_DESCRIPTION', 'Bitcoin (BTC), Ethereum (ETH) and other crypto currencies');
         Configuration::updateValue('PAYBEAR_EXCHANGE_LOCKTIME', '15');
-
-        // foreach ($this->cryptoCurrencies as $cryptoCurrency) {
-        //     if (!Configuration::updateValue('PAYBEAR_ENABLE_'.strtoupper($cryptoCurrency['name']), $cryptoCurrency['defaults']['enabled'])) {
-        //         return false;
-        //     }
-        //     if (!Configuration::updateValue('PAYBEAR_' . strtoupper($cryptoCurrency['name']) . '_CONFIRMATIONS', $cryptoCurrency['defaults']['confirmations'])) {
-        //         return false;
-        //     }
-        //
-        //     if (!Configuration::updateValue('PAYBEAR_' . strtoupper($cryptoCurrency['name']) . '_WALLET', '')) {
-        //         return false;
-        //     }
-        // }
 
         return true;
     }
@@ -280,11 +225,6 @@ class PayBear extends PaymentModule
         $helper->fields_value['paybear_exchange_locktime'] = Configuration::get('PAYBEAR_EXCHANGE_LOCKTIME');
         $helper->fields_value['paybear_api_secret'] = Configuration::get('PAYBEAR_API_SECRET');
         $helper->fields_value['paybear_api_public'] = Configuration::get('PAYBEAR_API_PUBLIC');
-        // foreach ($this->cryptoCurrencies as $currency) {
-        //     $helper->fields_value['paybear_enable_' . $currency['name']] = Configuration::get('PAYBEAR_ENABLE_' . strtoupper($currency['name']));
-        //     $helper->fields_value['paybear_' . $currency['name'] . '_confirmations'] = Configuration::get('PAYBEAR_' . strtoupper($currency['name']) . '_CONFIRMATIONS');
-        //     $helper->fields_value['paybear_' . $currency['name'] . '_wallet'] = Configuration::get('PAYBEAR_' . strtoupper($currency['name']) . '_WALLET');
-        // }
 
         return $helper->generateForm($fields_form);
     }
@@ -299,10 +239,13 @@ class PayBear extends PaymentModule
               `token` VARCHAR(256) NULL DEFAULT NULL,
               `address` VARCHAR(256),
               `invoice` VARCHAR(256),
-              `amount` DECIMAL(20, 7),
+              `amount` DECIMAL(20, 8),
               `confirmations` INT(2) NULL DEFAULT NULL,
               `date_add` DATETIME NULL DEFAULT NULL,
-              `date_upd` DATETIME NULL DEFAULT NULL
+              `date_upd` DATETIME NULL DEFAULT NULL,
+              `payment_add` DATETIME NULL DEFAULT NULL,
+              KEY `order_reference` (`order_reference`),
+              KEY `token` (`token`)
         ) ENGINE = "._MYSQL_ENGINE_;
 
         foreach ($sql as $q) {

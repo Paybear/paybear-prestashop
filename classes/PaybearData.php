@@ -21,6 +21,8 @@ class PaybearData extends ObjectModel
 
     public $token;
 
+    public $payment_add;
+
     /**
      * @see ObjectModel::$definition
      */
@@ -37,6 +39,7 @@ class PaybearData extends ObjectModel
             'amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'required' => true),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
+            'payment_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
         )
     );
 

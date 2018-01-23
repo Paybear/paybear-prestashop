@@ -2,7 +2,7 @@
 <module>
     <name>paybear</name>
     <displayName><![CDATA[Crypto Payment Gateway for PrestaShop by PayBear.io]]></displayName>
-    <version><![CDATA[1.0.0]]></version>
+    <version><![CDATA[0.2.0]]></version>
     <description><![CDATA[Allows to accept crypto payments such as Bitcoin (BTC) and Ethereum (ETH)]]></description>
     <author><![CDATA[PayBear]]></author>
     <tab><![CDATA[payments_gateways]]></tab>

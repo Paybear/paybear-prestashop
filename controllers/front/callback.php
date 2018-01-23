@@ -30,7 +30,7 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
                 $toPay = $paybearData->amount;
                 $amountPaid = $params->inTransaction->amount / pow(10, $params->inTransaction->exp);
                 $fiatPaid = $amountPaid * $sdk->getRate($params->blockchain);
-                $maxDifference = min($toPay * 0.005, 0.001);
+                $maxDifference = 0.00000001;
                 $paybear = Module::getInstanceByName('paybear');
 
                 PrestaShopLogger::addLog(sprintf('PayBear: to pay %s', $toPay), 1, null, 'Order', $order->id, true);
@@ -41,7 +41,7 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
 
                 if ($toPay > 0 && ($toPay - $fiatPaid) < $maxDifference) {
                     $orderTimestamp = strtotime($order->date_add);
-                    $paymentTimestamp = time();
+                    $paymentTimestamp = strtotime($paybearData->payment_add);
                     $deadline = $orderTimestamp + Configuration::get('PAYBEAR_EXCHANGE_LOCKTIME') * 60;
                     $orderStatus = Configuration::get('PS_OS_PAYMENT');
 
@@ -69,6 +69,14 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
 
                 echo $invoice; //stop further callbacks
                 die();
+            } elseif ($order->current_state != (int) Configuration::get('PAYBEAR_OS_WAITING_CONFIRMATIONS')) {
+                $paybearData->payment_add = date('Y-m-d H:i:s');
+                $paybearData->update();
+
+                $orderHistory = new OrderHistory();
+                $orderHistory->id_order = (int) $order->id;
+                $orderHistory->changeIdOrderState((int) Configuration::get('PAYBEAR_OS_WAITING_CONFIRMATIONS'), $order, false);
+                $order->add(true);
             }
         }
         die();

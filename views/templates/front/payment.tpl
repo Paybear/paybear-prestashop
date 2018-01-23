@@ -2,7 +2,7 @@
 {block name="content"}
     <div style="margin-bottom: 1.5rem">
         <!--Paybear.io code start-->
-        <div id="paybear" style="display: none;"
+        <div id="paybear" style="display: none"
              data-currencies="{$currencies}"
              data-status="{$status}"
              data-redirect="{$redirect}"
@@ -360,10 +360,12 @@
                                         <p>
                                             Redirecting you back in 5 seconds.
                                         </p>
-                                        <a href="#" class="P-btn P-btn-grey">
-                                            <i class="P-btn__icon P-btn__icon--refresh"></i>
-                                            Redirect Now
-                                        </a>
+                                        <div>
+                                            <a href="#" class="P-btn P-btn-grey">
+                                                <i class="P-btn__icon P-btn__icon--refresh"></i>
+                                                Redirect Now
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

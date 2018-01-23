@@ -12,6 +12,11 @@ class PayBearPaymentModuleFrontController extends ModuleFrontController
 
         /** @var Order $order */
         $order = Order::getByReference($orderReference)->getFirst();
+
+        if ($order->current_state != (int) Configuration::get('PAYBEAR_OS_WAITING')) {
+            Tools::redirect('index.php?controller=order');
+        }
+
         $customer = $order->getCustomer();
 
         $this->context->smarty->assign([
