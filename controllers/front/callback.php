@@ -18,15 +18,17 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
 
         if ($data) {
             $params = json_decode($data);
-            $minConfirmations = Configuration::get('PAYBEAR_' . strtoupper($params->blockchain) . '_CONFIRMATIONS');
-            $invoice = $params->invoice;
             $paybearData = PaybearData::getByOrderRefenceAndToken($orderReference, $params->blockchain);
+            $currencies = $sdk->getCurrencies();
+            $maxConfirmations = $currencies[$paybearData->token]['maxConfirmations'];
+            $invoice = $params->invoice;
+
             $paybearData->confirmations = $params->confirmations;
             $paybearData->update();
 
             PrestaShopLogger::addLog(sprintf('PayBear: incoming callback. Confirmations - %d', $params->confirmations), 1, null, 'Order', $order->id, true);
 
-            if ($params->confirmations >= $minConfirmations) {
+            if ($params->confirmations >= $maxConfirmations) {
                 $toPay = $paybearData->amount;
                 $amountPaid = $params->inTransaction->amount / pow(10, $params->inTransaction->exp);
                 $fiatPaid = $amountPaid * $sdk->getRate($params->blockchain);
