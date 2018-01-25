@@ -19,6 +19,7 @@ class PayBearSDK
         $order = Order::getByReference($orderId)->getFirst();
 
         $apiSecret = Configuration::get('PAYBEAR_API_SECRET');
+        $currencies = $this->getCurrencies();
 
         $rate = $this->getRate($token);
 
@@ -44,6 +45,7 @@ class PayBearSDK
                 $data->address = $response->data->address;
                 $data->invoice = $response->data->invoice;
                 $data->amount = $coinsAmount;
+                $data->max_confirmations = $currencies[strtolower($token)]['maxConfirmations'];
 
                 if ($data->id_paybear) {
                     $data->update();

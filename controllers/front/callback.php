@@ -11,16 +11,12 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
         $order = Order::getByReference($orderReference)->getFirst();
         $sdk = new PayBearSDK($this->context);
 
-        // $currency = new Currency($order->id_currency);
-        // $customer = $order->getCustomer();
-
         $data = file_get_contents('php://input');
 
         if ($data) {
             $params = json_decode($data);
             $paybearData = PaybearData::getByOrderRefenceAndToken($orderReference, $params->blockchain);
-            $currencies = $sdk->getCurrencies();
-            $maxConfirmations = $currencies[$paybearData->token]['maxConfirmations'];
+            $maxConfirmations = $paybearData->max_confirmations;
             $invoice = $params->invoice;
 
             $paybearData->confirmations = $params->confirmations;

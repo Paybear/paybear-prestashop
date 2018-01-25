@@ -23,6 +23,8 @@ class PaybearData extends ObjectModel
 
     public $payment_add;
 
+    public $max_confirmations;
+
     /**
      * @see ObjectModel::$definition
      */
@@ -34,6 +36,7 @@ class PaybearData extends ObjectModel
             'order_reference' => array('type' => self::TYPE_STRING, 'required' => true, 'validate' => 'isString'),
             'token' => array('type' => self::TYPE_STRING, 'required' => true, 'validate' => 'isString'),
             'confirmations' => array('type' => self::TYPE_INT, 'required' => false, 'validate' => false, 'allow_null' => true),
+            'max_confirmations' => array('type' => self::TYPE_INT, 'required' => false, 'validate' => false, 'allow_null' => true),
             'address' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'invoice' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'required' => true),

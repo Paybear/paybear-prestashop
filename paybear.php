@@ -241,6 +241,7 @@ class PayBear extends PaymentModule
               `invoice` VARCHAR(256),
               `amount` DECIMAL(20, 8),
               `confirmations` INT(2) NULL DEFAULT NULL,
+              `max_confirmations` INT(2) NULL DEFAULT NULL,
               `date_add` DATETIME NULL DEFAULT NULL,
               `date_upd` DATETIME NULL DEFAULT NULL,
               `payment_add` DATETIME NULL DEFAULT NULL,

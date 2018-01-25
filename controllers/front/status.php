@@ -9,10 +9,11 @@ class PayBearStatusModuleFrontController extends ModuleFrontController
         $orderReference = Tools::getValue('order');
         $paybearData = PaybearData::getByOrderRefence($orderReference);
 
-        $minConfirmations = Configuration::get('PAYBEAR_' . strtoupper($paybearData->token) . '_CONFIRMATIONS');;
+        // $minConfirmations = Configuration::get('PAYBEAR_' . strtoupper($paybearData->token) . '_CONFIRMATIONS');;
+        $maxConfirmations = $paybearData->max_confirmations;
         $confirmations = $paybearData->confirmations;
         $data = array();
-        if ($confirmations >= $minConfirmations) { //set max confirmations
+        if ($confirmations >= $maxConfirmations) { //set max confirmations
             $data['success'] = true;
         } else {
             $data['success'] = false;
