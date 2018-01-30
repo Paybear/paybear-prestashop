@@ -79,7 +79,7 @@ class PayBearSDK
             $currencies = $this->getCurrencies();
             $currency = (object) $currencies[strtolower($token)];
             $currency->coinsValue = $coinsValue;
-            $currency->rate = Tools::displayNumber(round($currency->rate, 2));
+            $currency->rate = round($currency->rate, 2);
 
 
             if ($getAddress) {
