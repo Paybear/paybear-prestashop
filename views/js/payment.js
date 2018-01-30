@@ -8,6 +8,7 @@ $(function () {
         redirectTo: $container.data('redirect'),
         fiatCurrency: $container.data('currency-iso'),
         fiatSign: $container.data('currency-sign'),
-        modal: false
+        modal: false,
+        enablePoweredBy: false
     });
 });

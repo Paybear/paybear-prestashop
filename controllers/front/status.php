@@ -18,6 +18,7 @@ class PayBearStatusModuleFrontController extends ModuleFrontController
         } else {
             $data['success'] = false;
         }
+
         if (is_numeric($confirmations)) {
             $data['confirmations'] = $confirmations;
         }

@@ -116,7 +116,7 @@
 
                                         <div class="P-Tabs__Tab-panel">
                                             <div class="P-Payment__qr">
-                                                <img src="#">
+                                                <img src="">
                                             </div>
                                         </div>
 

@@ -32,7 +32,7 @@ class PayBearSDK
 
         $callbackUrl = $this->context->link->getModuleLink('paybear', 'callback', array('order' => $orderId));
 
-        $url = sprintf('http://s.etherbill.io/v2/%s/payment/%s?token=%s', strtolower($token), urlencode($callbackUrl), $apiSecret);
+        $url = sprintf('https://api.paybear.io/v2/%s/payment/%s?token=%s', strtolower($token), urlencode($callbackUrl), $apiSecret);
         if ($response = file_get_contents($url)) {
             $response = json_decode($response);
 
@@ -79,6 +79,7 @@ class PayBearSDK
             $currencies = $this->getCurrencies();
             $currency = (object) $currencies[strtolower($token)];
             $currency->coinsValue = $coinsValue;
+            $currency->rate = Tools::displayNumber(round($currency->rate, 2));
 
 
             if ($getAddress) {
@@ -99,7 +100,7 @@ class PayBearSDK
     public function getCurrencies()
     {
         if (self::$currencies === null) {
-            $url = sprintf('http://s.etherbill.io/v2/currencies?token=%s', Configuration::get('PAYBEAR_API_SECRET'));
+            $url = sprintf('https://api.paybear.io/v2/currencies?token=%s', Configuration::get('PAYBEAR_API_SECRET'));
             $response = file_get_contents($url);
             $data = json_decode($response, true);
 
@@ -123,7 +124,7 @@ class PayBearSDK
         static $rates = null;
 
         if (empty($rates)) {
-            $url = "http://s.etherbill.io/v2/exchange/usd/rate";
+            $url = "https://api.paybear.io/v2/exchange/usd/rate";
 
             if ($response = file_get_contents($url)) {
                 $response = json_decode($response);
