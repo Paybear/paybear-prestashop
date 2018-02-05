@@ -27,7 +27,6 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
             if ($params->confirmations >= $maxConfirmations) {
                 $toPay = $paybearData->amount;
                 $amountPaid = $params->inTransaction->amount / pow(10, $params->inTransaction->exp);
-                $fiatPaid = $amountPaid * $sdk->getRate($params->blockchain);
                 $maxDifference = 0.00000001;
                 $paybear = Module::getInstanceByName('paybear');
 
@@ -37,7 +36,7 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
 
                 $orderStatus = Configuration::get('PS_OS_ERROR');
 
-                if ($toPay > 0 && ($toPay - $fiatPaid) < $maxDifference) {
+                if ($toPay > 0 && ($toPay - $amountPaid) < $maxDifference) {
                     $orderTimestamp = strtotime($order->date_add);
                     $paymentTimestamp = strtotime($paybearData->payment_add);
                     $deadline = $orderTimestamp + Configuration::get('PAYBEAR_EXCHANGE_LOCKTIME') * 60;
@@ -60,10 +59,7 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
                     PrestaShopLogger::addLog(sprintf('PayBear: wrong amount %s', $amountPaid), 2, null, 'Order', $order->id, true);
                 }
 
-                $orderHistory = new OrderHistory();
-                $orderHistory->id_order = (int) $order->id;
-                $orderHistory->changeIdOrderState((int) $orderStatus, $order, true);
-                $orderHistory->addWithemail(true);
+                $order->setCurrentState($orderStatus);
 
                 echo $invoice; //stop further callbacks
                 die();
@@ -71,10 +67,7 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
                 $paybearData->payment_add = date('Y-m-d H:i:s');
                 $paybearData->update();
 
-                $orderHistory = new OrderHistory();
-                $orderHistory->id_order = (int) $order->id;
-                $orderHistory->changeIdOrderState((int) Configuration::get('PAYBEAR_OS_WAITING_CONFIRMATIONS'), $order, false);
-                $order->add(true);
+                $order->setCurrentState((int) Configuration::get('PAYBEAR_OS_WAITING_CONFIRMATIONS'));
             }
         }
         die();
