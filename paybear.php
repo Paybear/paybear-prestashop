@@ -60,7 +60,7 @@ class PayBear extends PaymentModule
             return false;
         }
 
-        Configuration::updateValue('PAYBEAR_TITLE', 'Crypto Payments');
+        Configuration::updateValue('PAYBEAR_TITLE', 'Crypto Payments (BTC/ETH/LTC and others)');
         Configuration::updateValue('PAYBEAR_DESCRIPTION', 'Bitcoin (BTC), Ethereum (ETH) and other crypto currencies');
         Configuration::updateValue('PAYBEAR_EXCHANGE_LOCKTIME', '15');
 
@@ -83,6 +83,10 @@ class PayBear extends PaymentModule
         }
 
         if (!$this->checkCurrency($params['cart'])) {
+            return;
+        }
+
+        if (!Configuration::get('PAYBEAR_API_SECRET')) {
             return;
         }
 
@@ -264,50 +268,50 @@ class PayBear extends PaymentModule
      */
     public function installOrderState()
     {
-        if (!Configuration::get('PAYBEAR_OS_WAITING')
-            || !Validate::isLoadedObject(new OrderState(Configuration::get('PAYBEAR_OS_WAITING')))) {
-            $orderState = new OrderState();
-            $orderState->name = array();
-            foreach (Language::getLanguages() as $language) {
-                if (Tools::strtolower($language['iso_code']) == 'fr') {
-                    $orderState->name[$language['id_lang']] = 'En attente de paiement PayBear';
-                } else {
-                    $orderState->name[$language['id_lang']] = 'Awaiting for PayBear payment';
-                }
-            }
-            $orderState->send_email = false;
-            $orderState->color = '#4775de';
-            $orderState->hidden = false;
-            $orderState->delivery = false;
-            $orderState->logable = false;
-            $orderState->invoice = false;
-            if ($orderState->add()) {
-                $source = _PS_MODULE_DIR_.'paybear/logo_os.png';
-                $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $orderState->id.'.gif';
-                copy($source, $destination);
-            }
-            Configuration::updateValue('PAYBEAR_OS_WAITING', (int) $orderState->id);
-        }
+        $states = array(
+            array(
+                'name' => 'PAYBEAR_OS_WAITING',
+                'color' => '#4775de',
+                'title' => 'Awaiting for PayBear payment'
+            ),
+            array(
+                'name' => 'PAYBEAR_OS_WAITING_CONFIRMATIONS',
+                'color' => '#4775de',
+                'title' => 'Awaiting for PayBear payment confirmations'
+            ),
+            array(
+                'name' => 'PAYBEAR_OS_MISPAID',
+                'color' => '#8f0621',
+                'title' => 'Mispaid'
+            ),
+            array(
+                'name' => 'PAYBEAR_OS_LATE_PAYMENT_RATE_CHANGED',
+                'color' => '#8f0621',
+                'title' => 'Late Payment/Rate changed'
+            ),
+        );
 
-        if (!Configuration::get('PAYBEAR_OS_WAITING_CONFIRMATIONS')
-            || !Validate::isLoadedObject(new OrderState(Configuration::get('PAYBEAR_OS_WAITING_CONFIRMATIONS')))) {
-            $orderState = new OrderState();
-            $orderState->name = array();
-            foreach (Language::getLanguages() as $language) {
-                $orderState->name[$language['id_lang']] = 'Awaiting for PayBear payment confirmations';
+        foreach ($states as $state) {
+            if (!Configuration::get($state['name'])
+                || !Validate::isLoadedObject(new OrderState(Configuration::get($state['name'])))) {
+                $orderState = new OrderState();
+                $orderState->name = array();
+                foreach (Language::getLanguages() as $language) {
+                    $orderState->name[$language['id_lang']] = $state['title'];
+                }
+                $orderState->send_email = false;
+                $orderState->color = $state['color'];
+                $orderState->hidden = false;
+                $orderState->delivery = false;
+                $orderState->logable = false;
+                $orderState->invoice = false;
+                if ($orderState->add()) {
+                    $source = _PS_MODULE_DIR_.'paybear/logo_os.png';
+                    $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $orderState->id.'.gif';
+                    copy($source, $destination);
+                }
+                Configuration::updateValue($state['name'], (int) $orderState->id);
             }
-            $orderState->send_email = false;
-            $orderState->color = '#4775de';
-            $orderState->hidden = false;
-            $orderState->delivery = false;
-            $orderState->logable = false;
-            $orderState->invoice = false;
-            if ($orderState->add()) {
-                $source = _PS_MODULE_DIR_.'paybear/logo_os.png';
-                $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $orderState->id.'.gif';
-                copy($source, $destination);
-            }
-            Configuration::updateValue('PAYBEAR_OS_WAITING_CONFIRMATIONS', (int) $orderState->id);
         }
 
         return true;

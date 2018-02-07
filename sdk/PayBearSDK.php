@@ -124,7 +124,8 @@ class PayBearSDK
         static $rates = null;
 
         if (empty($rates)) {
-            $url = "https://api.paybear.io/v2/exchange/usd/rate";
+            $currency = $this->context->currency;
+            $url = sprintf("https://api.paybear.io/v2/exchange/%s/rate", strtolower($currency->iso_code));
 
             if ($response = file_get_contents($url)) {
                 $response = json_decode($response);

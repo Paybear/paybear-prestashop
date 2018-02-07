@@ -9,9 +9,19 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
         $orderReference = $_GET['order'];
         /** @var Order $order */
         $order = Order::getByReference($orderReference)->getFirst();
+        $currency = new Currency($order->id_currency);
+        $customer = $order->getCustomer();
         $sdk = new PayBearSDK($this->context);
 
         $data = file_get_contents('php://input');
+
+        if (in_array($order->current_state, array(
+            Configuration::get('PAYBEAR_OS_MISPAID'),
+            Configuration::get('PAYBEAR_OS_LATE_PAYMENT_RATE_CHANGED'),
+            Configuration::get('PS_OS_PAYMENT')
+        ))) {
+            die();
+        }
 
         if ($data) {
             $params = json_decode($data);
@@ -34,7 +44,8 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
                 PrestaShopLogger::addLog(sprintf('PayBear: paid %s', $amountPaid), 1, null, 'Order', $order->id, true);
                 PrestaShopLogger::addLog(sprintf('PayBear: maxDifference %s', $maxDifference), 1, null, 'Order', $order->id, true);
 
-                $orderStatus = Configuration::get('PS_OS_ERROR');
+                $orderStatus = Configuration::get('PAYBEAR_OS_MISPAID');
+                $message = false;
 
                 if ($toPay > 0 && ($toPay - $amountPaid) < $maxDifference) {
                     $orderTimestamp = strtotime($order->date_add);
@@ -43,12 +54,13 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
                     $orderStatus = Configuration::get('PS_OS_PAYMENT');
 
                     if ($paymentTimestamp > $deadline) {
-                        $orderStatus = Configuration::get('PS_OS_ERROR');
+                        $orderStatus = Configuration::get('PAYBEAR_OS_LATE_PAYMENT_RATE_CHANGED');
                         PrestaShopLogger::addLog('PayBear: late payment', 1, null, 'Order', $order->id, true);
 
                         $fiatPaid = $amountPaid * $sdk->getRate($params->blockchain);
                         if ($order->total_paid < $fiatPaid) {
                             PrestaShopLogger::addLog('PayBear: rate changed', 1, null, 'Order', $order->id, true);
+                            $message = sprintf('Late Payment / Rate changed (%s %s paid, %s %s expected)', $fiatPaid, $currency->iso_code, $order->total_paid, $currency->iso_code);
                         } else {
                             $orderStatus = Configuration::get('PS_OS_PAYMENT');
                             $order->addOrderPayment($amountPaid, $paybear->displayName, $params->inTransaction->hash);
@@ -57,9 +69,36 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
                     }
                 } else {
                     PrestaShopLogger::addLog(sprintf('PayBear: wrong amount %s', $amountPaid), 2, null, 'Order', $order->id, true);
+                    $underpaid = round(($toPay-$amountPaid)*$sdk->getRate($params->blockchain), 2);
+                    $message = sprintf('Wrong Amount Paid (%s %s received, %s %s expected) - %s %s underpaid', $amountPaid, $params->blockchain, $toPay, $params->blockchain, $currency->sign, $underpaid);
                 }
 
                 $order->setCurrentState($orderStatus);
+
+                if ($message) {
+                    $idCustomerThread = CustomerThread::getIdCustomerThreadByEmailAndIdOrder($customer->email, $order->id);
+                    if (!$idCustomerThread) {
+                        $customerThread = new CustomerThread();
+                        $customerThread->id_contact = 0;
+                        $customerThread->id_customer = (int)$order->id_customer;
+                        $customerThread->id_shop = (int)$this->context->shop->id;
+                        $customerThread->id_order = (int)$order->id;
+                        $customerThread->id_lang = (int)$this->context->language->id;
+                        $customerThread->email = $customer->email;
+                        $customerThread->status = 'open';
+                        $customerThread->token = Tools::passwdGen(12);
+                        $customerThread->add();
+                    } else {
+                        $customerThread = new CustomerThread((int)$idCustomerThread);
+                    }
+
+                    $customerMessage = new CustomerMessage();
+                    $customerMessage->id_customer_thread = $customerThread->id;
+                    // $customerMessage->id_employee = (int)$this->context->employee->id;
+                    $customerMessage->message = $message;
+                    $customerMessage->private = 0;
+                    $customerMessage->add();
+                }
 
                 echo $invoice; //stop further callbacks
                 die();
