@@ -22,7 +22,7 @@ class PayBear extends PaymentModule
     {
         $this->name = 'paybear';
         $this->tab = 'payments_gateways';
-        $this->version = '0.4.1';
+        $this->version = '0.5.1';
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
         $this->author = 'PayBear';
         $this->controllers = array('validation', 'currencies', 'payment', 'callback', 'status');
@@ -34,7 +34,7 @@ class PayBear extends PaymentModule
         $this->bootstrap = true;
         parent::__construct();
 
-        $this->displayName = $this->l('Crypto Payment Gateway for PrestaShop by PayBear.io');
+        $this->displayName = $this->l('Crypto Payments by PayBear.io');
         $this->description = $this->l('Allows to accept crypto payments such as Bitcoin (BTC) and Ethereum (ETH)');
 
         if (!count(Currency::checkPaymentCurrencies($this->id))) {
