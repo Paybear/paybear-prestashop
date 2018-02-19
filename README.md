@@ -7,7 +7,7 @@ https://www.paybear.io
 Once registered, you can manage the currencies you want to integrate in the Membership area / Currencies. Please enable the currencies there before using this integration.
 <h3>How to install</h3>
 
-1. Make sure you have Prestashop installed. We recommend running the latest version.
+1. Make sure you have Prestashop installed. Versions 1.6 and 1.7 are supported. We recommend running the latest version.
 2. Download the latest version of the integration: https://github.com/Paybear/paybear-prestashop/releases/latest
 3. Open Prestashop Admin - Extensions - Installer
 4. Click {Upload a Module} and select the ZIP file of the plugin
