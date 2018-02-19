@@ -1,7 +1,5 @@
 <?php
 
-use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -22,8 +20,8 @@ class PayBear extends PaymentModule
     {
         $this->name = 'paybear';
         $this->tab = 'payments_gateways';
-        $this->version = '0.5.1';
-        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
+        $this->version = '0.6.0';
+        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->author = 'PayBear';
         $this->controllers = array('validation', 'currencies', 'payment', 'callback', 'status');
         $this->is_eu_compatible = 1;
@@ -35,7 +33,7 @@ class PayBear extends PaymentModule
         parent::__construct();
 
         $this->displayName = $this->l('Crypto Payments by PayBear.io');
-        $this->description = $this->l('Allows to accept crypto payments such as Bitcoin (BTC) and Ethereum (ETH)');
+        $this->description = $this->l('Allows to accept crypto payments such as Bitcoin (BTC), Ethereum (ETH) and other crypto currencies');
 
         if (!count(Currency::checkPaymentCurrencies($this->id))) {
             $this->warning = $this->l('No currency has been set for this module.');
@@ -52,28 +50,48 @@ class PayBear extends PaymentModule
             return false;
         }
 
-        if (!parent::install()
-            || !$this->registerHook('paymentOptions')
-            || !$this->registerHook('paymentReturn')
-            || !$this->registerHook('header')
-        ) {
-            return false;
+
+        if ((float) _PS_VERSION_ < 1.7) {
+            // hooks for 1.6
+            if (!parent::install() || !$this->registerHook('payment') || $this->registerHook('header')) {
+                return false;
+            }
+        } else {
+            // hooks for 1.7
+            if (!parent::install()
+                || !$this->registerHook('paymentOptions')
+                || !$this->registerHook('paymentReturn')
+                || !$this->registerHook('header')
+            ) {
+                return false;
+            }
         }
 
         Configuration::updateValue('PAYBEAR_TITLE', 'Crypto Payments (BTC/ETH/LTC and others)');
         Configuration::updateValue('PAYBEAR_DESCRIPTION', 'Bitcoin (BTC), Ethereum (ETH) and other crypto currencies');
         Configuration::updateValue('PAYBEAR_EXCHANGE_LOCKTIME', '15');
+        Configuration::updateValue('PAYBEAR_MAX_UNDERPAYMENT', '0.01');
+        Configuration::updateValue('PAYBEAR_MIN_OVERPAYMENT', '1');
 
         return true;
     }
 
     public function hookHeader()
     {
-        if (Tools::getValue('controller') == "payment") {
+        if (Tools::getValue('controller') == "payment" && (float) _PS_VERSION_ >= 1.7) {
             $this->context->controller->registerStylesheet($this->name . '-css', 'modules/' . $this->name . '/views/css/paybear.css');
             $this->context->controller->registerJavascript($this->name . '-lib-js', 'modules/' . $this->name . '/views/js/paybear.js');
             $this->context->controller->registerJavascript($this->name . '-js', 'modules/' . $this->name . '/views/js/payment.js');
         }
+    }
+
+    public function hookPayment($params)
+    {
+        $this->smarty->assign(array(
+            'this_path' => $this->_path,
+            'this_path_bw' => $this->_path,
+        ));
+        return $this->display(__FILE__, 'payment.tpl');
     }
 
     public function hookPaymentOptions($params)
@@ -115,7 +133,7 @@ class PayBear extends PaymentModule
     public function getEmbeddedPaymentOption()
     {
         libxml_use_internal_errors(true);
-        $embeddedOption = new PaymentOption();
+        $embeddedOption = new \PrestaShop\PrestaShop\Core\Payment\PaymentOption();
         $embeddedOption
             ->setModuleName($this->name)
             ->setCallToActionText(Configuration::get('PAYBEAR_TITLE'))
@@ -148,7 +166,8 @@ class PayBear extends PaymentModule
     public function displayForm()
     {
         // Get default language
-        $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
+        $defaultLang = (int) Configuration::get('PS_LANG_DEFAULT');
+        $defaultCurrency = new Currency((int) Configuration::get('PS_CURRENCY_DEFAULT'));
 
         // Init Fields form array
         $fields_form[0]['form'] = array(
@@ -191,6 +210,16 @@ class PayBear extends PaymentModule
                 'name' => 'paybear_exchange_locktime',
                 'desc' => 'Lock Fiat to Crypto exchange rate for this long (in minutes, 15 is the recommended minimum)'
             ),
+            array(
+                'type' => 'text',
+                'label' => sprintf('Max Underpayment (%s)', $defaultCurrency->iso_code),
+                'name' => 'paybear_max_underpayment',
+            ),
+            array(
+                'type' => 'text',
+                'label' => sprintf('Min Overpayment (%s)', $defaultCurrency->iso_code),
+                'name' => 'paybear_min_overpayment',
+            )
         );
 
         $helper = new HelperForm();
@@ -202,8 +231,8 @@ class PayBear extends PaymentModule
         $helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
 
         // Language
-        $helper->default_form_language = $default_lang;
-        $helper->allow_employee_form_lang = $default_lang;
+        $helper->default_form_language = $defaultLang;
+        $helper->allow_employee_form_lang = $defaultLang;
 
         // Title and toolbar
         $helper->title = $this->displayName;
@@ -229,6 +258,8 @@ class PayBear extends PaymentModule
         $helper->fields_value['paybear_exchange_locktime'] = Configuration::get('PAYBEAR_EXCHANGE_LOCKTIME');
         $helper->fields_value['paybear_api_secret'] = Configuration::get('PAYBEAR_API_SECRET');
         $helper->fields_value['paybear_api_public'] = Configuration::get('PAYBEAR_API_PUBLIC');
+        $helper->fields_value['paybear_max_underpayment'] = Configuration::get('PAYBEAR_MAX_UNDERPAYMENT');
+        $helper->fields_value['paybear_min_overpayment'] = Configuration::get('PAYBEAR_MIN_OVERPAYMENT');
 
         return $helper->generateForm($fields_form);
     }
@@ -248,9 +279,27 @@ class PayBear extends PaymentModule
               `max_confirmations` INT(2) NULL DEFAULT NULL,
               `date_add` DATETIME NULL DEFAULT NULL,
               `date_upd` DATETIME NULL DEFAULT NULL,
-              `payment_add` DATETIME NULL DEFAULT NULL,
               KEY `order_reference` (`order_reference`),
               KEY `token` (`token`)
+        ) ENGINE = "._MYSQL_ENGINE_;
+
+        $sql[] = "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."paybear_transaction` (
+              `id_paybear_transaction` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+              `order_reference` VARCHAR(9) NOT NULL,
+              `invoice` VARCHAR(255) NULL DEFAULT NULL,
+              `blockchain` VARCHAR(255) NULL DEFAULT NULL,
+              `address` VARCHAR(255) NULL DEFAULT NULL,
+              `amount` DECIMAL(20, 8),
+              `currency` VARCHAR(255) NULL DEFAULT NULL,
+              `rate` DECIMAL(20, 8) NULL DEFAULT NULL,
+              `transaction_hash` VARCHAR(255) NULL DEFAULT NULL,
+              `confirmations` INT(2) NULL DEFAULT NULL,
+              `max_confirmations` INT(2) NULL DEFAULT NULL,
+              `date_add` DATETIME NULL DEFAULT NULL,
+              `date_upd` DATETIME NULL DEFAULT NULL,
+              KEY `order_reference` (`order_reference`),
+              KEY `blockchain` (`blockchain`),
+              KEY `transaction_hash` (`transaction_hash`)
         ) ENGINE = "._MYSQL_ENGINE_;
 
         foreach ($sql as $q) {
@@ -291,25 +340,37 @@ class PayBear extends PaymentModule
             ),
         );
 
+        $allOrderStates = OrderState::getOrderStates($this->context->language->id);
+        $allOrderStatesOrdered = [];
+
+        foreach ($allOrderStates as $orderState) {
+            $allOrderStatesOrdered[$orderState['name']] = $orderState;
+        }
+
         foreach ($states as $state) {
             if (!Configuration::get($state['name'])
                 || !Validate::isLoadedObject(new OrderState(Configuration::get($state['name'])))) {
-                $orderState = new OrderState();
-                $orderState->name = array();
-                foreach (Language::getLanguages() as $language) {
-                    $orderState->name[$language['id_lang']] = $state['title'];
+                if (!isset($allOrderStatesOrdered[$state['title']])) {
+                    $orderState = new OrderState();
+                    $orderState->name = array();
+                    foreach (Language::getLanguages() as $language) {
+                        $orderState->name[$language['id_lang']] = $state['title'];
+                    }
+                    $orderState->send_email = false;
+                    $orderState->color = $state['color'];
+                    $orderState->hidden = false;
+                    $orderState->delivery = false;
+                    $orderState->logable = false;
+                    $orderState->invoice = false;
+                    if ($orderState->add()) {
+                        $source = _PS_MODULE_DIR_.'paybear/logo_os.png';
+                        $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $orderState->id.'.gif';
+                        copy($source, $destination);
+                    }
+                } else {
+                    $orderState = new OrderState($allOrderStatesOrdered[$state['title']]['id_order_state']);
                 }
-                $orderState->send_email = false;
-                $orderState->color = $state['color'];
-                $orderState->hidden = false;
-                $orderState->delivery = false;
-                $orderState->logable = false;
-                $orderState->invoice = false;
-                if ($orderState->add()) {
-                    $source = _PS_MODULE_DIR_.'paybear/logo_os.png';
-                    $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $orderState->id.'.gif';
-                    copy($source, $destination);
-                }
+
                 Configuration::updateValue($state['name'], (int) $orderState->id);
             }
         }

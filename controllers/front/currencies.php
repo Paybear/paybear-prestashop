@@ -17,8 +17,12 @@ class PayBearCurrenciesModuleFrontController extends ModuleFrontController
         } else {
             $data = [];
             $currencies = $sdk->getCurrencies();
+            $getAddress = false;
+            if (count($currencies) == 1) {
+                $getAddress = true;
+            }
             foreach ($currencies as $token => $currency) {
-                $currency = $sdk->getCurrency($token, $orderId);
+                $currency = $sdk->getCurrency($token, $orderId, $getAddress);
                 if ($currency) {
                     $data[] = $currency;
                 }

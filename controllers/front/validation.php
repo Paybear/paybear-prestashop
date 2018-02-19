@@ -59,7 +59,12 @@ class PayBearValidationModuleFrontController extends ModuleFrontController
         $mailVars = array();
 
         $this->module->validateOrder($cart->id, Configuration::get('PAYBEAR_OS_WAITING'), 0, $this->module->displayName, NULL, $mailVars, (int)$currency->id, false, $customer->secure_key);
-        $order = new Order(Order::getIdByCartId($cart->id));
+        if ((float) _PS_VERSION_ < 1.7) {
+            $order = new Order(Order::getOrderByCartId($cart->id));
+        } else {
+            $order = new Order(Order::getIdByCartId($cart->id));
+        }
+
         $link = $this->context->link->getModuleLink($this->module->name, 'payment', array('order' => $order->reference));
         Tools::redirect($link);
     }

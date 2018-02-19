@@ -3,7 +3,10 @@
 
 class PayBearSDK
 {
+    public static $rates = null;
     public static $currencies = null;
+
+    protected $baseUrl = 'https://api.paybear.io/v2';
 
     protected $context;
 
@@ -32,8 +35,8 @@ class PayBearSDK
 
         $callbackUrl = $this->context->link->getModuleLink('paybear', 'callback', array('order' => $orderId));
 
-        $url = sprintf('https://api.paybear.io/v2/%s/payment/%s?token=%s', strtolower($token), urlencode($callbackUrl), $apiSecret);
-        if ($response = file_get_contents($url)) {
+        $url = sprintf('%s/%s/payment/%s?token=%s', $this->baseUrl, strtolower($token), urlencode($callbackUrl), $apiSecret);
+        if ($response = Tools::file_get_contents($url)) {
             $response = json_decode($response);
 
             if (isset($response->data->address)) {
@@ -44,7 +47,7 @@ class PayBearSDK
                 $data->token = strtolower($token);
                 $data->address = $response->data->address;
                 $data->invoice = $response->data->invoice;
-                $data->amount = $coinsAmount;
+                $data->amount = sprintf('%.8F', $coinsAmount);
                 $data->max_confirmations = $currencies[strtolower($token)]['maxConfirmations'];
 
                 if ($data->id_paybear) {
@@ -79,7 +82,7 @@ class PayBearSDK
             $currencies = $this->getCurrencies();
             $currency = (object) $currencies[strtolower($token)];
             $currency->coinsValue = $coinsValue;
-            $currency->rate = round($currency->rate, 2);
+            $currency->rate = round($this->getRate($currency->code), 2);
 
 
             if ($getAddress) {
@@ -100,8 +103,8 @@ class PayBearSDK
     public function getCurrencies()
     {
         if (self::$currencies === null) {
-            $url = sprintf('https://api.paybear.io/v2/currencies?token=%s', Configuration::get('PAYBEAR_API_SECRET'));
-            $response = file_get_contents($url);
+            $url = sprintf('%s/currencies?token=%s', $this->baseUrl, Configuration::get('PAYBEAR_API_SECRET'));
+            $response = Tools::file_get_contents($url);
             $data = json_decode($response, true);
 
             self::$currencies = $data['data'];
@@ -121,20 +124,38 @@ class PayBearSDK
 
     public function getRates()
     {
-        static $rates = null;
-
-        if (empty($rates)) {
+        if (empty(self::$rates)) {
+            $needUpdate = false;
             $currency = $this->context->currency;
-            $url = sprintf("https://api.paybear.io/v2/exchange/%s/rate", strtolower($currency->iso_code));
+            $ratesKey = sprintf('PAYBEAR_%s_RATES', strtoupper($currency->iso_code));
+            $ratesTimestampKey = sprintf('%s_TIMESTAMP', $ratesKey);
+            $ratesString = Configuration::get($ratesKey);
+            $ratesTimestamp = (int) Configuration::get($ratesTimestampKey);
 
-            if ($response = file_get_contents($url)) {
-                $response = json_decode($response);
-                if ($response->success) {
-                    $rates = $response->data;
+            if ($ratesString && $ratesTimestamp) {
+                $ratesDeadline = $ratesTimestamp + Configuration::get('PAYBEAR_EXCHANGE_LOCKTIME') * 60;
+                if ($ratesDeadline < time()) {
+                    $needUpdate = true;
+                }
+            }
+
+
+            if (!$needUpdate && !empty($ratesString)) {
+                self::$rates = json_decode($ratesString);
+            } else {
+                $url = sprintf("%s/exchange/%s/rate", $this->baseUrl, strtolower($currency->iso_code));
+
+                if ($response = Tools::file_get_contents($url)) {
+                    $response = json_decode($response);
+                    if ($response->success) {
+                        Configuration::updateValue($ratesKey, json_encode($response->data));
+                        Configuration::updateValue($ratesTimestampKey, time());
+                        self::$rates = $response->data;
+                    }
                 }
             }
         }
 
-        return $rates;
+        return self::$rates;
     }
 }
