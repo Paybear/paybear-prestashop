@@ -776,7 +776,7 @@
             paymentConfirmed.querySelector('h2').innerHTML =
                 '<div><b>Whoops, you overpaid: ' + overPaid + '&nbsp;' + selectedCoin.code + '</b></div>';
             var confirmedP = paymentConfirmed.querySelector('p');
-            confirmedP.innerHTML = 'To get your overpayment refunded, please contact the merchant directly.';
+            confirmedP.innerHTML = 'To get your overpayment refunded, please contact the merchant directly and share your Order ID and ' + selectedCoin.code + ' address to send your refund to.';
             confirmedP.removeAttribute('style');
 
         } else {

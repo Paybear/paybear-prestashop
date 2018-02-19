@@ -36,14 +36,14 @@
                             </div>
                         </div>
                         <div class="PayBear__brand-link" style="display: none;">
-                    <span>
-                        Powered by <a href="https://www.paybear.io" target="_blank" rel="noopener noreferrer">
-                        PayBear.io<svg height="14" viewBox="0 0 14 14" width="14" xmlns="http://www.w3.org/2000/svg"
-                                       class="PayBear__Nav__external">
-                        <path d="m333.875 38c-.482562 0-.875-.392-.875-.875v-12.25c0-.483.392438-.875.875-.875h5.6875c.241938 0 .4375.1955625.4375.4375v.875c0 .2419375-.195562.4375-.4375.4375h-4.8125v10.5h10.5v-4.8125c0-.2419375.195562-.4375.4375-.4375h.875c.241938 0 .4375.1955625.4375.4375v5.6875c0 .483-.392438.875-.875.875zm12.690554-14c .240249 0 .434446.1933285.434446.4344461v4.3444615c0 .1746474-.10557.3340891-.268053.4005594-.053872.0230256-.11035.0338868-.166393.0338868-.112956 0-.224174-.0443135-.307154-.1272927l-1.557489-1.5579239-4.344027 4.3444615c-.169869.1698684-.444438.1698684-.615176 0l-.614307-.6143069c-.169868-.1698684-.169868-.4444384 0-.6143068l4.344462-4.3444615-1.557924-1.5579239c-.124252-.1246861-.161614-.3114979-.094275-.4735463.066905-.1629173.225912-.2680533.401428-.2680533z"
-                              fill="#b9b9b9" transform="translate(-333 -24)"></path>
-                        </svg></a>
-                    </span>
+                        <span>
+                            Powered by <a href="https://www.paybear.io" target="_blank" rel="noopener noreferrer">
+                            PayBear.io<svg height="14" viewBox="0 0 14 14" width="14" xmlns="http://www.w3.org/2000/svg"
+                                           class="PayBear__Nav__external">
+                            <path d="m333.875 38c-.482562 0-.875-.392-.875-.875v-12.25c0-.483.392438-.875.875-.875h5.6875c.241938 0 .4375.1955625.4375.4375v.875c0 .2419375-.195562.4375-.4375.4375h-4.8125v10.5h10.5v-4.8125c0-.2419375.195562-.4375.4375-.4375h.875c.241938 0 .4375.1955625.4375.4375v5.6875c0 .483-.392438.875-.875.875zm12.690554-14c .240249 0 .434446.1933285.434446.4344461v4.3444615c0 .1746474-.10557.3340891-.268053.4005594-.053872.0230256-.11035.0338868-.166393.0338868-.112956 0-.224174-.0443135-.307154-.1272927l-1.557489-1.5579239-4.344027 4.3444615c-.169869.1698684-.444438.1698684-.615176 0l-.614307-.6143069c-.169868-.1698684-.169868-.4444384 0-.6143068l4.344462-4.3444615-1.557924-1.5579239c-.124252-.1246861-.161614-.3114979-.094275-.4735463.066905-.1629173.225912-.2680533.401428-.2680533z"
+                                  fill="#b9b9b9" transform="translate(-333 -24)"></path>
+                            </svg></a>
+                        </span>
                         </div>
                     </div>
                     <!-- Select currency -->
@@ -63,9 +63,9 @@
                             <!-- First payment step -->
                             <div class="P-Payment__start">
                                 <div class="P-Payment__value">
-                            <span class="P-Payment__value__icon">
-                                <img src="">
-                            </span>
+                                <span class="P-Payment__value__icon">
+                                    <img src="">
+                                </span>
                                     <span class="P-Payment__value__pay">PAY <span class="P-Payment__value__coins"></span></span>
                                 </div>
                                 <div class="P-Tabs" id="paybear-tabs">
@@ -81,10 +81,10 @@
                                     <div class="P-Tabs__Tab-panel P-Tabs__Tab-panel--wallet">
                                         <div>
                                             <a href="#" class="P-btn-block P-wallet-btn">
-                                        <span class="P-btn-block__inner">
-                                            <i class="P-wallet-icon"></i>
-                                            <span class="P-btn-block__text">Open in Wallet</span>
-                                        </span>
+                                            <span class="P-btn-block__inner">
+                                                <i class="P-wallet-icon"></i>
+                                                <span class="P-btn-block__text">Open in Wallet</span>
+                                            </span>
                                             </a>
                                         </div>
                                     </div>
@@ -92,24 +92,24 @@
                                     <div class="P-Tabs__Tab-panel P-Tabs__Tab-panel--selected">
                                         <div class="P-buttons-flex">
                                             <a class="P-btn-block P-btn-copy-address">
-                                        <span class="P-btn-block__copied-text">
-                                            <svg height="11" viewBox="0 0 13 11" width="13" xmlns="http://www.w3.org/2000/svg"><path d="m4.42775177 7.85005539 5.97311463-5.97311463c.5359766-.53597656 1.4049663-.53597656 1.9409428 0 .5359766.53597657.5359766 1.40496628 0 1.94094285l-6.93193869 6.93193869c-.5029721.5029721-1.29920739.5339442-1.83829672.0929164-.06892267-.0472373-.13449273-.1014683-.19571746-.1626931l-2.71766557-2.71766553c-.53597656-.53597657-.53597656-1.40496628 0-1.94094285.53597657-.53597656 1.40496628-.53597656 1.94094285 0z" fill-rule="evenodd" fill="#4FBDA6" transform="translate(0 -1)"/></svg>
-                                            Copied to Clipboard!
-                                        </span>
+                                            <span class="P-btn-block__copied-text">
+                                                <svg height="11" viewBox="0 0 13 11" width="13" xmlns="http://www.w3.org/2000/svg"><path d="m4.42775177 7.85005539 5.97311463-5.97311463c.5359766-.53597656 1.4049663-.53597656 1.9409428 0 .5359766.53597657.5359766 1.40496628 0 1.94094285l-6.93193869 6.93193869c-.5029721.5029721-1.29920739.5339442-1.83829672.0929164-.06892267-.0472373-.13449273-.1014683-.19571746-.1626931l-2.71766557-2.71766553c-.53597656-.53597657-.53597656-1.40496628 0-1.94094285.53597657-.53597656 1.40496628-.53597656 1.94094285 0z" fill-rule="evenodd" fill="#4FBDA6" transform="translate(0 -1)"/></svg>
+                                                Copied to Clipboard!
+                                            </span>
                                                 <span class="P-btn-block__inner">
-                                            <span class="P-btn-block__helper">--</span>
-                                            Copy Address
-                                        </span>
+                                                <span class="P-btn-block__helper">--</span>
+                                                Copy Address
+                                            </span>
                                             </a>
                                             <a class="P-btn-block P-Payment__value__copy">
-                                        <span class="P-btn-block__copied-text">
-                                            <svg height="11" viewBox="0 0 13 11" width="13" xmlns="http://www.w3.org/2000/svg"><path d="m4.42775177 7.85005539 5.97311463-5.97311463c.5359766-.53597656 1.4049663-.53597656 1.9409428 0 .5359766.53597657.5359766 1.40496628 0 1.94094285l-6.93193869 6.93193869c-.5029721.5029721-1.29920739.5339442-1.83829672.0929164-.06892267-.0472373-.13449273-.1014683-.19571746-.1626931l-2.71766557-2.71766553c-.53597656-.53597657-.53597656-1.40496628 0-1.94094285.53597657-.53597656 1.40496628-.53597656 1.94094285 0z" fill-rule="evenodd" fill="#4FBDA6" transform="translate(0 -1)"/></svg>
-                                            Copied to Clipboard!
-                                        </span>
+                                            <span class="P-btn-block__copied-text">
+                                                <svg height="11" viewBox="0 0 13 11" width="13" xmlns="http://www.w3.org/2000/svg"><path d="m4.42775177 7.85005539 5.97311463-5.97311463c.5359766-.53597656 1.4049663-.53597656 1.9409428 0 .5359766.53597657.5359766 1.40496628 0 1.94094285l-6.93193869 6.93193869c-.5029721.5029721-1.29920739.5339442-1.83829672.0929164-.06892267-.0472373-.13449273-.1014683-.19571746-.1626931l-2.71766557-2.71766553c-.53597656-.53597657-.53597656-1.40496628 0-1.94094285.53597657-.53597656 1.40496628-.53597656 1.94094285 0z" fill-rule="evenodd" fill="#4FBDA6" transform="translate(0 -1)"/></svg>
+                                                Copied to Clipboard!
+                                            </span>
                                                 <span class="P-btn-block__inner">
-                                            <span class="P-btn-block__helper">--</span>
-                                            Copy Amount
-                                        </span>
+                                                <span class="P-btn-block__helper">--</span>
+                                                Copy Amount
+                                            </span>
                                             </a>
                                         </div>
                                     </div>
