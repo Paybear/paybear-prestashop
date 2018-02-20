@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
-	<name>paybear</name>
-	<displayName><![CDATA[Crypto Payments by PayBear.io]]></displayName>
-	<version><![CDATA[0.6.0]]></version>
-	<description><![CDATA[Allows to accept crypto payments such as Bitcoin (BTC), Ethereum (ETH) and other crypto currencies]]></description>
-	<author><![CDATA[PayBear]]></author>
-	<tab><![CDATA[payments_gateways]]></tab>
-	<is_configurable>1</is_configurable>
-	<need_instance>1</need_instance>
+    <name>paybear</name>
+    <displayName><![CDATA[Crypto Payments by PayBear.io]]></displayName>
+    <version><![CDATA[0.6.0]]></version>
+    <description><![CDATA[Allows to accept crypto payments such as Bitcoin (BTC), Ethereum (ETH) and other crypto currencies]]></description>
+    <author><![CDATA[PayBear]]></author>
+    <tab><![CDATA[payments_gateways]]></tab>
+    <is_configurable>1</is_configurable>
+    <need_instance>1</need_instance>
 	<limited_countries></limited_countries>
 </module>

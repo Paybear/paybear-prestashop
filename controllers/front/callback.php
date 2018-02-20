@@ -20,6 +20,7 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
         $sdk = new PayBearSDK($this->context);
         $data = file_get_contents('php://input');
         $message = null;
+        $addMessage = true;
         $paybear = Module::getInstanceByName('paybear');
         $updateStatus = true;
 
@@ -67,6 +68,8 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
             $paybearPayment->currency = $currency->iso_code;
             $paybearPayment->address = $paybearData->address;
             $paybearPayment->transaction_hash = $params->inTransaction->hash;
+        } else {
+            $addMessage = false; // message already sent
         }
 
         if (isset($allPaybearPayments[$paybearPayment->transaction_hash])) {
@@ -90,8 +93,9 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
             }
             $updateStatus = false;
             $underpaid = $toPay - $totalPaid;
+            $underpaidFiat = $underpaid * $rate;
             // $underpaidFiat = round(($toPay-$totalPaid) * $rate, 2);
-            $message = sprintf("Looks like you underpaid %.8F %s\n\nDon't worry, here is what to do next:\n\nContact the merchant directly and...\n-Request details on how you can pay the difference..\n-Request a refund and create a new order.\n\nTips for Paying with Crypto:\n\nTip 1) When paying, ensure you send the correct amount in %s. Do not manually enter the %s Value.\n\nTip 2)  If you are sending from an exchange, be sure to correctly factor in their withdrawal fees.\n\nTip 3) Be sure to successfully send your payment before the countdown timer expires.\nThis timer is setup to lock in a fixed rate for your payment. Once it expires, the rate changes.", $underpaid, strtoupper($params->blockchain), strtoupper($params->blockchain), $currency->iso_code);
+            $message = sprintf("Looks like you underpaid %.8F %s (%.2F %s)\n\nDon't worry, here is what to do next:\n\nContact the merchant directly and...\n-Request details on how you can pay the difference..\n-Request a refund and create a new order.\n\nTips for Paying with Crypto:\n\nTip 1) When paying, ensure you send the correct amount in %s. Do not manually enter the %s Value.\n\nTip 2)  If you are sending from an exchange, be sure to correctly factor in their withdrawal fees.\n\nTip 3) Be sure to successfully send your payment before the countdown timer expires.\nThis timer is setup to lock in a fixed rate for your payment. Once it expires, the rate changes.", $underpaid, strtoupper($params->blockchain), $underpaidFiat, $currency->iso_code, strtoupper($params->blockchain), $currency->iso_code);
         }
 
         if ($params->confirmations >= $maxConfirmations && $maxConfirmations > 0) {
@@ -108,12 +112,15 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
 
                     $fiatPaid = $totalPaid * $rate;
                     if ($order->total_paid > $fiatPaid) {
+                        $underpaid = $toPay - $totalPaid;
+                        $underpaidFiat = $underpaid * $rate;
                         PrestaShopLogger::addLog('PayBear: rate changed', 1, null, 'Order', $order->id, true);
-                        $message = sprintf("Looks like you underpaid %.8F %s\nThis was due to the payment being sent after the Countdown Timer Expired.\n\nDon't worry, here is what to do next:\n\nContact the merchant directly and...\n-Request details on how you can pay the difference..\n-Request a refund and create a new order.\n\nTips for Paying with Crypto:\n\nTip 1) When paying, ensure you send the correct amount in %s. Do not manually enter the %s Value.\n\nTip 2)  If you are sending from an exchange, be sure to correctly factor in their withdrawal fees.\n\nTip 3) Be sure to successfully send your payment before the countdown timer expires.\nThis timer is setup to lock in a fixed rate for your payment. Once it expires, the rate changes.", $underpaid, strtoupper($params->blockchain), strtoupper($params->blockchain), $currency->iso_code);
+                        $message = sprintf("Looks like you underpaid %.8F %s (%.2F %s)\nThis was due to the payment being sent after the Countdown Timer Expired.\n\nDon't worry, here is what to do next:\n\nContact the merchant directly and...\n-Request details on how you can pay the difference..\n-Request a refund and create a new order.\n\nTips for Paying with Crypto:\n\nTip 1) When paying, ensure you send the correct amount in %s. Do not manually enter the %s Value.\n\nTip 2)  If you are sending from an exchange, be sure to correctly factor in their withdrawal fees.\n\nTip 3) Be sure to successfully send your payment before the countdown timer expires.\nThis timer is setup to lock in a fixed rate for your payment. Once it expires, the rate changes.", $underpaid, strtoupper($params->blockchain), $underpaidFiat, $currency->iso_code, strtoupper($params->blockchain), $currency->iso_code);
+                        $addMessage = true;
                         // $message = sprintf('Late Payment / Rate changed (%s %s paid, %s %s expected)', $fiatPaid, $currency->iso_code, $order->total_paid, $currency->iso_code);
                     } else {
                         $orderStatus = Configuration::get('PS_OS_PAYMENT');
-                        $order->addOrderPayment($paidNow, $paybear->displayName, $params->inTransaction->hash);
+                        $order->addOrderPayment($fiatPaid, $paybear->displayName, $params->inTransaction->hash);
                         PrestaShopLogger::addLog(sprintf('PayBear: payment complete', $paidNow), 1, null, 'Order', $order->id, true);
                     }
                 }
@@ -124,6 +131,7 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
 
                 if ($overpaidFiat > $minOverpaymentFiat) {
                     $message = sprintf("Whoops, you overpaid: %.8F %s\n\nDon’t worry, here is what to do next:\nTo get your overpayment refunded, please contact the merchant directly and share your Order ID %s and %s Address to send your refund to.\n\nTips for Paying with Crypto:\n\nTip 1) When paying, ensure you send the correct amount in %s. Do not manually enter the %s Value.\n\nTip 2)  If you are sending from an exchange, be sure to correctly factor in their withdrawal fees.\n\nTip 3) Be sure to successfully send your payment before the countdown timer expires.\nThis timer is setup to lock in a fixed rate for your payment. Once it expires, the rate changes.", $overpaid, strtoupper($params->blockchain), $orderReference, strtoupper($params->blockchain), strtoupper($params->blockchain), strtoupper($currency->iso_code));
+                    $addMessage = true;
                 }
             }
 
@@ -134,7 +142,7 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
         }
 
         // Send message to customer if needed
-        if ($message) {
+        if ($message && $addMessage) {
             $idCustomerThread = CustomerThread::getIdCustomerThreadByEmailAndIdOrder($customer->email, $order->id);
             if (!$idCustomerThread) {
                 $customerThread = new CustomerThread();
@@ -163,7 +171,7 @@ class PayBearCallbackModuleFrontController extends ModuleFrontController
                 $message = Tools::nl2br($customerMessage->message);
             }
 
-            $orderLanguage = new Language((int) $order->id_lang);
+            // $orderLanguage = new Language((int) $order->id_lang);
             $varsTpl = array(
                 '{lastname}' => $customer->lastname,
                 '{firstname}' => $customer->firstname,
