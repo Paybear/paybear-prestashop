@@ -212,13 +212,15 @@ class PayBear extends PaymentModule
             ),
             array(
                 'type' => 'text',
-                'label' => sprintf('Max Underpayment (%s)', $defaultCurrency->iso_code),
+                'label' => sprintf('Underpayment (%s)', $defaultCurrency->iso_code),
                 'name' => 'paybear_max_underpayment',
+                'desc' => 'The client will be notified and required to pay the balance owed for underpayments greater than this specified amount'
             ),
             array(
                 'type' => 'text',
-                'label' => sprintf('Min Overpayment (%s)', $defaultCurrency->iso_code),
+                'label' => sprintf('Overpayment (%s)', $defaultCurrency->iso_code),
                 'name' => 'paybear_min_overpayment',
+                'desc' => ' The client will be notified about their overpayment if it is greater than this amount. You will then need to issue the overpayment refund.'
             )
         );
 
