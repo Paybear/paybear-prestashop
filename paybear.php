@@ -53,7 +53,7 @@ class PayBear extends PaymentModule
 
         if ((float) _PS_VERSION_ < 1.7) {
             // hooks for 1.6
-            if (!parent::install() || !$this->registerHook('payment') || $this->registerHook('header')) {
+            if (!parent::install() || !$this->registerHook('payment') || !$this->registerHook('header')) {
                 return false;
             }
         } else {
