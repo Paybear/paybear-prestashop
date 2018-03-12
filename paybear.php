@@ -20,7 +20,7 @@ class PayBear extends PaymentModule
     {
         $this->name = 'paybear';
         $this->tab = 'payments_gateways';
-        $this->version = '0.6.0';
+        $this->version = '0.6.4';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->author = 'PayBear';
         $this->controllers = array('validation', 'currencies', 'payment', 'callback', 'status');

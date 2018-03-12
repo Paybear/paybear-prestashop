@@ -35,8 +35,11 @@ class PayBearValidationModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         $cart = $this->context->cart;
-        if ($cart->id_customer == 0 || $cart->id_address_delivery == 0 || $cart->id_address_invoice == 0 || !$this->module->active)
+        if ($cart->id_customer == 0 || $cart->id_address_delivery == 0 || $cart->id_address_invoice == 0 || !$this->module->active) {
+            $logMessage = sprintf('PayBear: order validation failed. id_customer: %s, id_address_delivery: %s, id_address_invoice: %s', $cart->id_customer, $cart->id_address_delivery, $cart->id_address_invoice);
+            PrestaShopLogger::addLog($logMessage, 1, null, 'Cart', $cart->id, true);
             Tools::redirect('index.php?controller=order&step=1');
+        }
 
         // Check that this payment option is still available in case the customer changed his address just before the end of the checkout process
         $authorized = false;
@@ -52,6 +55,8 @@ class PayBearValidationModuleFrontController extends ModuleFrontController
 
         $customer = new Customer($cart->id_customer);
         if (!Validate::isLoadedObject($customer)) {
+            $logMessage = sprintf('Paybear: order validation failed. Customer not found (%s)', $cart->id_customer);
+            PrestaShopLogger::addLog($logMessage, 1, null, 'Cart', $cart->id, true);
             Tools::redirect('index.php?controller=order&step=1');
         }
 
