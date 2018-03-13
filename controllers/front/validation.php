@@ -70,7 +70,7 @@ class PayBearValidationModuleFrontController extends ModuleFrontController
             $order = new Order(Order::getIdByCartId($cart->id));
         }
 
-        $link = $this->context->link->getModuleLink($this->module->name, 'payment', array('order' => $order->reference));
+        $link = $this->context->link->getModuleLink($this->module->name, 'pay', array('order' => $order->reference));
         Tools::redirect($link);
     }
 }

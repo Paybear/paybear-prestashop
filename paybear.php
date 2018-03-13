@@ -20,7 +20,7 @@ class PayBear extends PaymentModule
     {
         $this->name = 'paybear';
         $this->tab = 'payments_gateways';
-        $this->version = '0.6.4';
+        $this->version = '0.7.0';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->author = 'PayBear';
         $this->controllers = array('validation', 'currencies', 'payment', 'callback', 'status');
@@ -78,7 +78,7 @@ class PayBear extends PaymentModule
 
     public function hookHeader()
     {
-        if (Tools::getValue('controller') == "payment" && (float) _PS_VERSION_ >= 1.7) {
+        if (Tools::getValue('controller') == "pay" && (float) _PS_VERSION_ >= 1.7) {
             $this->context->controller->registerStylesheet($this->name . '-css', 'modules/' . $this->name . '/views/css/paybear.css');
             $this->context->controller->registerJavascript($this->name . '-lib-js', 'modules/' . $this->name . '/views/js/paybear.js');
             $this->context->controller->registerJavascript($this->name . '-js', 'modules/' . $this->name . '/views/js/payment.js');

@@ -2,7 +2,7 @@
 
 include_once(_PS_MODULE_DIR_.'paybear/sdk/PayBearSDK.php');
 
-class PayBearPaymentModuleFrontController extends ModuleFrontController
+class PayBearPayModuleFrontController extends ModuleFrontController
 {
     public function initContent()
     {
@@ -17,6 +17,8 @@ class PayBearPaymentModuleFrontController extends ModuleFrontController
                 (int) Configuration::get('PAYBEAR_OS_WAITING'),
                 (int) Configuration::get('PAYBEAR_OS_MISPAID'),
             ])) {
+            $logMessage = sprintf('Paybear: payment failed. order: %s, order status: %s', $order->id, $order->current_state);
+            PrestaShopLogger::addLog($logMessage, 1, null, 'Order', $order->id, true);
             Tools::redirect('index.php?controller=order');
         }
 
