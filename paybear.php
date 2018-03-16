@@ -20,7 +20,7 @@ class PayBear extends PaymentModule
     {
         $this->name = 'paybear';
         $this->tab = 'payments_gateways';
-        $this->version = '0.7.0';
+        $this->version = '0.7.1';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->author = 'PayBear';
         $this->controllers = array('validation', 'currencies', 'payment', 'callback', 'status');
@@ -37,6 +37,10 @@ class PayBear extends PaymentModule
 
         if (!count(Currency::checkPaymentCurrencies($this->id))) {
             $this->warning = $this->l('No currency has been set for this module.');
+        }
+
+        if (!Configuration::get('PAYBEAR_API_SECRET') || !Configuration::get('PAYBEAR_API_PUBLIC')) {
+            $this->warning = $this->l('Please set your API keys');
         }
     }
 
@@ -87,6 +91,18 @@ class PayBear extends PaymentModule
 
     public function hookPayment($params)
     {
+        if (!$this->active) {
+            return;
+        }
+
+        if (!$this->checkCurrency($params['cart'])) {
+            return;
+        }
+
+        if (!Configuration::get('PAYBEAR_API_SECRET')) {
+            return;
+        }
+
         $this->smarty->assign(array(
             'this_path' => $this->_path,
             'this_path_bw' => $this->_path,
