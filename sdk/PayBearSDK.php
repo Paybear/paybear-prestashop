@@ -95,8 +95,6 @@ class PayBearSDK
 
         }
 
-        echo 'can\'t get rate for ' . $token;
-
         return null;
     }
 
@@ -106,8 +104,10 @@ class PayBearSDK
             $url = sprintf('%s/currencies?token=%s', $this->baseUrl, Configuration::get('PAYBEAR_API_SECRET'));
             $response = Tools::file_get_contents($url);
             $data = json_decode($response, true);
-
-            self::$currencies = $data['data'];
+            self::$currencies = [];
+            if ($data['success']) {
+                self::$currencies = $data['data'];
+            }
         }
 
         return self::$currencies;

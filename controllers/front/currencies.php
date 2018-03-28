@@ -34,6 +34,7 @@ class PayBearCurrenciesModuleFrontController extends ModuleFrontController
 
             // tmp solution
             if ($currentCurrencyToken) {
+                $getAddress = true;
                 $currency = $sdk->getCurrency($currentCurrencyToken, $orderId, true);
                 $currencies = array();
                 $currencies[$currentCurrencyToken] = $currency;

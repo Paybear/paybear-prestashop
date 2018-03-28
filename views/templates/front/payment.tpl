@@ -1,4 +1,8 @@
 {extends "$layout"}
+
+{block name="hook_footer_before"}
+{/block}
+
 {block name="content"}
     <div style="margin-bottom: 1.5rem">
         <!--Paybear.io code start-->
@@ -11,6 +15,7 @@
              data-currency-sign="{$shopCurrency->sign}"
              data-min-overpayment-fiat="{$minOverpaymentFiat}"
              data-max-underpayment-fiat="{$maxUnderpaymentFiat}"
+             data-autoopen="true"
         >
             <div class="p30 PayBear-spinner" style="display: none;">
                 <p>Loading payment details...</p>
@@ -390,5 +395,60 @@
                 </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="card">
+                    <table class="table table-bordered table-striped" style="margin-bottom: 0">
+                        <tbody>
+                        <tr>
+                            <th>Order</th>
+                            <td>#{$order->reference}</td>
+                        </tr>
+                        <tr>
+                            <th>Payment status</th>
+                            <td>{ucwords($paymentStatus)}</td>
+                        </tr>
+                        {if $paybearData}
+                            <tr>
+                                <th>Selected Token</th>
+                                <td>{strtoupper($paybearData->token)}</td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    Payment address
+                                </th>
+                                <td><a href="{$blockExplorer}" target="_blank">{$paybearData->address}</a></td>
+                            </tr>
+                        {/if}
+                        <tr>
+                            <th>Total</th>
+                            <td>{$total}</td>
+                        </tr>
+                        {if $alreadyPaid}
+                            <tr>
+                                <th>Paid</th>
+                                <td>{$alreadyPaidFiatFormatted}</td>
+                            </tr>
+                            {if $toPayFiat > $maxUnderpaymentFiat}
+                                <tr>
+                                    <th>To Pay</th>
+                                    <td>{$toPayFiatFormatted}</td>
+                                </tr>
+                            {/if}
+                        {/if}
+                        </tbody>
+                    </table>
+                </div>
+                {if $order->current_state == $statusWaitingForConfirmations}
+                    <a href="" class="btn btn-primary float-right">Refresh</a>
+                {elseif $order->current_state == $statusPaymentAccepted}
+                    <a href="{$redirect}" class="btn btn-primary float-right">Continue</a>
+                {else}
+                    <button id="paybear-all" class="btn btn-primary float-right">Pay with Crypto</button>
+                {/if}
+            </div>
+        </div>
     </div>
+    <div class="clearfix"></div>
 {/block}

@@ -4,6 +4,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+include_once(_PS_MODULE_DIR_.'paybear/sdk/PayBearSDK.php');
 include_once 'classes/PaybearData.php';
 
 class PayBear extends PaymentModule
@@ -20,7 +21,7 @@ class PayBear extends PaymentModule
     {
         $this->name = 'paybear';
         $this->tab = 'payments_gateways';
-        $this->version = '0.7.1';
+        $this->version = '0.7.3';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->author = 'PayBear';
         $this->controllers = array('validation', 'currencies', 'payment', 'callback', 'status');
@@ -71,7 +72,7 @@ class PayBear extends PaymentModule
             }
         }
 
-        Configuration::updateValue('PAYBEAR_TITLE', 'Crypto Payments (BTC/ETH/LTC and others)');
+        Configuration::updateValue('PAYBEAR_TITLE', 'Pay with Crypto (BTC/ETH/LTC and others)');
         Configuration::updateValue('PAYBEAR_DESCRIPTION', 'Bitcoin (BTC), Ethereum (ETH) and other crypto currencies');
         Configuration::updateValue('PAYBEAR_EXCHANGE_LOCKTIME', '15');
         Configuration::updateValue('PAYBEAR_MAX_UNDERPAYMENT', '0.01');
@@ -135,6 +136,13 @@ class PayBear extends PaymentModule
     {
         $currency_order = new Currency($cart->id_currency);
         $currencies_module = $this->getCurrency($cart->id_currency);
+
+        $sdk = new PayBearSDK($this->context);
+
+        $availableCurrencies = $sdk->getCurrencies();
+        if (empty($availableCurrencies)) {
+            return false;
+        }
 
         if (is_array($currencies_module)) {
             foreach ($currencies_module as $currency_module) {

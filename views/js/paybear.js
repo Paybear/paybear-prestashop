@@ -78,6 +78,7 @@
             redirectTimeout: 5,
             minOverpaymentFiat: 1,
             maxUnderpaymentFiat: 0.01,
+            statusInterval: 10000,
         };
 
         this.options = defaults;
@@ -182,9 +183,30 @@
             } else {
                 try {
                     var response = JSON.parse(xhr.responseText);
-                    if (Array.isArray(response)) {
+                    if (Array.isArray(response) || Object.prototype.toString.call(response) === '[object Object]') {
                         handleCurrenciesSuccess();
                         var currencies = response;
+                        if (Object.prototype.toString.call(response) === '[object Object]') {
+                            if (response.title) { // single currency
+                                currencies = [response];
+                            } else {
+                                function isNumber(n) {
+                                    return !isNaN(parseFloat(n)) && isFinite(n);
+                                }
+
+                                currencies = [];
+                                for(var i in response) {
+                                    if (response.hasOwnProperty(i)) {
+                                        if (isNumber(i)) {
+                                            currencies[i] = response[i];
+                                        } else {
+                                            currencies.push(response[i]);
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
                         state.currencies  = currencies;
 
                         if (currencies.length > 1) {
@@ -197,6 +219,7 @@
                         handleCurrenciesError.call(that);
                     }
                 } catch(e) {
+                    console.log(e);
                     handleCurrenciesError.call(that);
                 }
             }
@@ -250,6 +273,7 @@
                                 that.state.selected = index;
                                 paymentStart.call(that);
                             } catch(e) {
+                                console.log(e);
                                 handleCurrencyError.call(that);
                             }
                         }
@@ -320,8 +344,6 @@
         var state = that.state;
         var options = that.options;
 
-        bindUnloadHandler.call(that);
-
         if (!that.state.currencies[that.state.selected].address) {
             handleCurrencyError.call(that);
             throw new Error(
@@ -329,9 +351,7 @@
             );
         }
 
-        if (options.unloadHandler) {
-            window.addEventListener('beforeunload', options.unloadHandler);
-        }
+        bindUnloadHandler.call(that);
 
         // clear payments start events
         var temp = document.createElement('div');
@@ -548,7 +568,7 @@
                 xhr.open('GET', url, true);
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 xhr.send();
-            }, 10000);
+            }, options.statusInterval);
         }
     }
 
@@ -646,6 +666,8 @@
 
         if (!isConfirming) {
 
+            unbindUnloadHandler.call(that);
+
             that.topBackButton.style.display = 'none';
 
             that.paymentHeader.classList.remove('P-Payment__header--red');
@@ -673,19 +695,26 @@
                 var blockExplorer = state.currencies[state.selected].blockExplorer;
                 paymentConfirming.style.display = 'none';
                 paymentHelper.removeAttribute('style');
-                if (paymentHelper.clientHeight > document.querySelector('.P-box__inner').clientHeight) {
-                    paymentHelper.style.overflowY = 'scroll';
-                }
                 if (blockExplorer) {
                     var blockExplorerLink = blockExplorer.replace(/%s/g, selectedCoin.address);
                     paymentHelper.querySelector('.block-explorer-li').style.display = 'block';
                     paymentHelper.querySelector('.P-block-explorer').setAttribute('href', blockExplorerLink);
                 }
+                paymentHelperOverflow();
+                window.addEventListener('resize', paymentHelperOverflow);
+
             });
             paymentHelperBtn.addEventListener('click', function () {
+                window.removeEventListener('resize', paymentHelperOverflow);
                 paymentConfirming.removeAttribute('style');
                 paymentHelper.style.display = 'none';
             });
+            function paymentHelperOverflow() {
+                paymentHelper.removeAttribute('style');
+                if (paymentHelper.clientHeight > document.querySelector('.P-box__inner').clientHeight) {
+                    paymentHelper.style.overflowY = 'scroll';
+                }
+            }
 
             //header
             that.paymentHeaderTitle.textContent = 'Confirming Payment';
@@ -694,7 +723,16 @@
                 .innerHTML = 'Payment Detected. Waiting for ' + coinConfirmations +
                 (coinConfirmations === 1 ? ' Confirmation' : ' Confirmations');
 
-            if (options.modal) {
+            if (options.redirectPendingTo) {
+                paymentConfirming.querySelector('.P-btn').addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (typeof options.redirectPendingTo === 'string') {
+                        window.location = options.redirectPendingTo;
+                        return false;
+                    }
+                    options.redirectPendingTo();
+                });
+            } else if (options.modal) {
                 paymentConfirming.querySelector('.P-btn').addEventListener('click', function (e) {
                     e.preventDefault();
                     hideModal.call(that);
@@ -723,9 +761,11 @@
 
         var paymentStartScreen = document.querySelector('.P-Payment__start');
         var paymentConfirming = document.querySelector('.P-Payment__confirming');
+        var paymentConfirmingHelper = document.querySelector('.P-Payment__confirming-helper');
         var paymentConfirmed = document.querySelector('.P-Payment__confirmed');
         paymentStartScreen.style.display = 'none';
         paymentConfirming.style.display = 'none';
+        paymentConfirmingHelper.style.display = 'none';
         paymentConfirmed.removeAttribute('style');
 
         //header
@@ -1163,6 +1203,38 @@
             that.state.unloadBound = false;
             window.removeEventListener('beforeunload', options.unloadHandler);
         }
+    }
+
+    if (!Object.assign) {
+        Object.defineProperty(Object, 'assign', {
+            enumerable: false,
+            configurable: true,
+            writable: true,
+            value: function(target, firstSource) {
+                'use strict';
+                if (target === undefined || target === null) {
+                    throw new TypeError('Cannot convert first argument to object');
+                }
+
+                var to = Object(target);
+                for (var i = 1; i < arguments.length; i++) {
+                    var nextSource = arguments[i];
+                    if (nextSource === undefined || nextSource === null) {
+                        continue;
+                    }
+
+                    var keysArray = Object.keys(Object(nextSource));
+                    for (var nextIndex = 0, len = keysArray.length; nextIndex < len; nextIndex++) {
+                        var nextKey = keysArray[nextIndex];
+                        var desc = Object.getOwnPropertyDescriptor(nextSource, nextKey);
+                        if (desc !== undefined && desc.enumerable) {
+                            to[nextKey] = nextSource[nextKey];
+                        }
+                    }
+                }
+                return to;
+            }
+        });
     }
 
 }());
