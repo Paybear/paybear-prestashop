@@ -25,7 +25,7 @@ class PayBear extends PaymentModule
     {
         $this->name = 'paybear';
         $this->tab = 'payments_gateways';
-        $this->version = '0.7.4';
+        $this->version = '0.7.5';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->author = 'PayBear';
         $this->controllers = array('validation', 'currencies', 'payment', 'callback', 'status');
@@ -81,7 +81,7 @@ class PayBear extends PaymentModule
             }
         }
 
-        Configuration::updateValue('PAYBEAR_TITLE', 'Pay with Crypto (BTC/ETH/LTC and others)');
+        Configuration::updateValue('PAYBEAR_TITLE', 'Pay with Crypto via PayBear (BTC/ETH/LTC and more)');
         Configuration::updateValue('PAYBEAR_DESCRIPTION', '');
         Configuration::updateValue('PAYBEAR_EXCHANGE_LOCKTIME', '15');
         Configuration::updateValue('PAYBEAR_MAX_UNDERPAYMENT', '0.01');
