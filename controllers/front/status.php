@@ -1,6 +1,6 @@
 <?php
 
-include_once(_PS_MODULE_DIR_.'paybear/sdk/PayBearSDK.php');
+include_once _PS_MODULE_DIR_.'paybear/sdk/PayBearSDK.php';
 
 class PayBearStatusModuleFrontController extends ModuleFrontController
 {
@@ -8,9 +8,13 @@ class PayBearStatusModuleFrontController extends ModuleFrontController
     {
         $orderReference = Tools::getValue('order');
         $paybearData = PaybearData::getByOrderRefence($orderReference);
-        $allPayments = $paybearData->getPayments();
-        $toPay = $paybearData->amount;
         $success = false;
+        $allPayments = [];
+        if ($paybearData) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $allPayments = $paybearData->getPayments();
+            $toPay = $paybearData->amount;
+        }
         $unpaidConfirmations = array();
         $sdk = new PayBearSDK($this->context);
         $rate = $sdk->getRate($paybearData->token);

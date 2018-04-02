@@ -11,7 +11,7 @@ $(function () {
         minOverpaymentFiat: $container.data('min-overpayment-fiat'),
         maxUnderpaymentFiat: $container.data('max-underpayment-fiat'),
         modal: true,
-        enablePoweredBy: false,
+        enablePoweredBy: true,
         redirectPendingTo: $container.data('redirect')
     });
 

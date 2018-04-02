@@ -116,6 +116,7 @@ class PaybearData extends ObjectModel
 
         $raw = Db::getInstance()->getRow($sql);
         if ($raw && isset($raw['id_paybear'])) {
+            /** @noinspection PhpUnhandledExceptionInspection */
             return new self($raw['id_paybear']);
         }
 
@@ -123,6 +124,8 @@ class PaybearData extends ObjectModel
     }
 
     /**
+     * @param null|string $excludeHash
+     *
      * @return PaybearTransaction[]
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException

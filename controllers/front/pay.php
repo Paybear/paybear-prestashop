@@ -23,29 +23,28 @@ class PayBearPayModuleFrontController extends ModuleFrontController
         $statusWaitingForConfirmations = Configuration::get('PAYBEAR_OS_WAITING_CONFIRMATIONS');
         $statusMispaid = Configuration::get('PAYBEAR_OS_MISPAID');
 
-        // var_dump($order->current_state);
-        // var_dump(Configuration::get('PS_OS_PAYMENT'));
-        // die();
-
-        if ($order->current_state == Configuration::get('PS_OS_PAYMENT')) {
+        if ((int) $order->current_state === (int) Configuration::get('PS_OS_PAYMENT')) {
             $paymentStatus = 'paid';
         }
 
-        if ($order->current_state == Configuration::get('PAYBEAR_OS_WAITING_CONFIRMATIONS')) {
+        if ((int) $order->current_state === (int) Configuration::get('PAYBEAR_OS_WAITING_CONFIRMATIONS')) {
             $paymentStatus = 'waiting for confirmations';
         }
 
-        if ($order->current_state == Configuration::get('PAYBEAR_OS_MISPAID')) {
+        if ((int) $order->current_state === (int) Configuration::get('PAYBEAR_OS_MISPAID')) {
             $paymentStatus = 'partial payment';
         }
 
         if ($paybearData) {
+            /** @noinspection PhpUnhandledExceptionInspection */
             $allPaybearPayments = $paybearData->getPayments();
             $selectedCurrency = $sdk->getCurrency($paybearData->token, $orderReference);
-            $blockExplorer = sprintf($selectedCurrency->blockExplorer, $paybearData->address);
+            if ($selectedCurrency) {
+                $blockExplorer = sprintf($selectedCurrency->blockExplorer, $paybearData->address);
+            }
         }
 
-        $maxUnderpaymentFiat = Configuration::get('PAYBEAR_MAX_UNDERPAYMENT');
+        // $maxUnderpaymentFiat = Configuration::get('PAYBEAR_MAX_UNDERPAYMENT');
         $toPayFiat = $order->total_paid;
         $alreadyPaid = 0;
         $alreadyPaidFiat = 0;
@@ -56,17 +55,8 @@ class PayBearPayModuleFrontController extends ModuleFrontController
         if ($alreadyPaid > 0) {
             $rate = round($order->total_paid / $paybearData->amount, 8);
             $alreadyPaidFiat = $alreadyPaid * $rate;
-            $toPayFiat = $toPayFiat - $alreadyPaidFiat;
+            $toPayFiat -= $alreadyPaidFiat;
         }
-
-        // if (!in_array($order->current_state, [
-        //         (int) Configuration::get('PAYBEAR_OS_WAITING'),
-        //         (int) Configuration::get('PAYBEAR_OS_MISPAID'),
-        //     ])) {
-        //     $logMessage = sprintf('Paybear: payment failed. order: %s, order status: %s', $order->id, $order->current_state);
-        //     PrestaShopLogger::addLog($logMessage, 1, null, 'Order', $order->id, true);
-        //     Tools::redirect('index.php?controller=order');
-        // }
 
         if ((float) _PS_VERSION_ < 1.7) {
             $redirectTo = 'index.php?controller=order-detail&&id_order='.$order->id.'&key='.$customer->secure_key;
@@ -103,6 +93,7 @@ class PayBearPayModuleFrontController extends ModuleFrontController
             $template = 'module:paybear/views/templates/front/payment.tpl';
         }
 
+        /** @noinspection PhpUnhandledExceptionInspection */
         $this->setTemplate($template);
     }
 }

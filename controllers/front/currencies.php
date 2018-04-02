@@ -18,13 +18,14 @@ class PayBearCurrenciesModuleFrontController extends ModuleFrontController
             $data = [];
             $currencies = $sdk->getCurrencies();
             $getAddress = false;
-            if (count($currencies) == 1) {
+            if (count($currencies) === 1) {
                 $getAddress = true;
             }
 
             $paybearData = PaybearData::getByOrderRefence($orderId);
             $currentCurrencyToken = null;
             if ($paybearData) {
+                /** @noinspection PhpUnhandledExceptionInspection */
                 $allPaybearPayments = $paybearData->getPayments();
                 if (!empty($allPaybearPayments)) {
                     $firstPayment = current($allPaybearPayments);
@@ -46,7 +47,7 @@ class PayBearCurrenciesModuleFrontController extends ModuleFrontController
                     $coinsPaid = 0;
                     if ($paybearData && !empty($allPaybearPayments)) {
                         foreach ($allPaybearPayments as $payment) {
-                            if ($payment->blockchain == strtolower($currency->code)) {
+                            if ($payment->blockchain === strtolower($currency->code)) {
                                 $coinsPaid += $payment->amount;
                             }
                         }

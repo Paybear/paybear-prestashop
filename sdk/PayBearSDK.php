@@ -17,6 +17,7 @@ class PayBearSDK
 
     public function getAddress($orderId, $token = 'ETH')
     {
+        $token = self::sanitizeToken($token);
         $data = PaybearData::getByOrderRefence($orderId);
         /** @var Order $order */
         $order = Order::getByReference($orderId)->getFirst();
@@ -36,6 +37,7 @@ class PayBearSDK
         $callbackUrl = $this->context->link->getModuleLink('paybear', 'callback', array('order' => $orderId));
 
         $url = sprintf('%s/%s/payment/%s?token=%s', $this->baseUrl, strtolower($token), urlencode($callbackUrl), $apiSecret);
+        // var_dump($url);
         if ($response = Tools::file_get_contents($url)) {
             $response = json_decode($response);
 
@@ -65,11 +67,13 @@ class PayBearSDK
 
     public function getPayout($token)
     {
+        $token = self::sanitizeToken($token);
         return Configuration::get('PAYBEAR_'.strtoupper($token) . '_WALLET');
     }
 
     public function getCurrency($token, $orderId, $getAddress = false)
     {
+        $token = self::sanitizeToken($token);
         $rate = $this->getRate($token);
 
         if ($rate) {
@@ -157,5 +161,17 @@ class PayBearSDK
         }
 
         return self::$rates;
+    }
+
+    /**
+     * @param string $token
+     *
+     * @return string
+     */
+    public static function sanitizeToken($token) {
+        $token = strtolower($token);
+        $token = preg_replace('/[^a-z0-9:]/', '', $token);
+
+        return $token;
     }
 }

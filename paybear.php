@@ -4,9 +4,13 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-include_once(_PS_MODULE_DIR_.'paybear/sdk/PayBearSDK.php');
+include_once _PS_MODULE_DIR_.'paybear/sdk/PayBearSDK.php';
 include_once 'classes/PaybearData.php';
 
+/**
+ * @property int  is_eu_compatible
+ * @property bool bootstrap
+ */
 class PayBear extends PaymentModule
 {
     protected $_html = '';
@@ -45,6 +49,11 @@ class PayBear extends PaymentModule
         }
     }
 
+    /**
+     * @return bool
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
     public function install()
     {
         if (!$this->installOrderState()) {
@@ -73,7 +82,7 @@ class PayBear extends PaymentModule
         }
 
         Configuration::updateValue('PAYBEAR_TITLE', 'Pay with Crypto (BTC/ETH/LTC and others)');
-        Configuration::updateValue('PAYBEAR_DESCRIPTION', 'Bitcoin (BTC), Ethereum (ETH) and other crypto currencies');
+        Configuration::updateValue('PAYBEAR_DESCRIPTION', '');
         Configuration::updateValue('PAYBEAR_EXCHANGE_LOCKTIME', '15');
         Configuration::updateValue('PAYBEAR_MAX_UNDERPAYMENT', '0.01');
         Configuration::updateValue('PAYBEAR_MIN_OVERPAYMENT', '1');
@@ -83,7 +92,7 @@ class PayBear extends PaymentModule
 
     public function hookHeader()
     {
-        if (Tools::getValue('controller') == "pay" && (float) _PS_VERSION_ >= 1.7) {
+        if ((float) _PS_VERSION_ >= 1.7 && Tools::getValue('controller') === 'pay') {
             $this->context->controller->registerStylesheet($this->name . '-css', 'modules/' . $this->name . '/views/css/paybear.css');
             $this->context->controller->registerJavascript($this->name . '-lib-js', 'modules/' . $this->name . '/views/js/paybear.js');
             $this->context->controller->registerJavascript($this->name . '-js', 'modules/' . $this->name . '/views/js/payment.js');
@@ -93,15 +102,15 @@ class PayBear extends PaymentModule
     public function hookPayment($params)
     {
         if (!$this->active) {
-            return;
+            return null;
         }
 
         if (!$this->checkCurrency($params['cart'])) {
-            return;
+            return null;
         }
 
         if (!Configuration::get('PAYBEAR_API_SECRET')) {
-            return;
+            return null;
         }
 
         $this->smarty->assign(array(
@@ -114,22 +123,20 @@ class PayBear extends PaymentModule
     public function hookPaymentOptions($params)
     {
         if (!$this->active) {
-            return;
+            return [];
         }
 
         if (!$this->checkCurrency($params['cart'])) {
-            return;
+            return [];
         }
 
         if (!Configuration::get('PAYBEAR_API_SECRET')) {
-            return;
+            return [];
         }
 
-        $payment_options = [
+        return [
             $this->getEmbeddedPaymentOption(),
         ];
-
-        return $payment_options;
     }
 
     public function checkCurrency($cart)
@@ -175,9 +182,10 @@ class PayBear extends PaymentModule
 
         if (Tools::isSubmit('submit'.$this->name))
         {
+            /** @var array $values */
             $values = Tools::getAllValues();
             foreach ($values as $name => $value) {
-                if (strstr($name, 'paybear_')) {
+                if (strpos($name, 'paybear_') !== false) {
                     Configuration::updateValue(strtoupper($name), $value);
                 }
             }
@@ -294,7 +302,7 @@ class PayBear extends PaymentModule
     {
         $sql = array();
 
-        $sql[] = "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."paybear_data` (
+        $sql[] = 'CREATE TABLE IF NOT EXISTS `' ._DB_PREFIX_. 'paybear_data` (
               `id_paybear` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
               `order_reference` VARCHAR(9) NOT NULL,
               `token` VARCHAR(256) NULL DEFAULT NULL,
@@ -307,9 +315,9 @@ class PayBear extends PaymentModule
               `date_upd` DATETIME NULL DEFAULT NULL,
               KEY `order_reference` (`order_reference`),
               KEY `token` (`token`)
-        ) ENGINE = "._MYSQL_ENGINE_;
+        ) ENGINE = ' ._MYSQL_ENGINE_;
 
-        $sql[] = "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."paybear_transaction` (
+        $sql[] = 'CREATE TABLE IF NOT EXISTS `' ._DB_PREFIX_. 'paybear_transaction` (
               `id_paybear_transaction` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
               `order_reference` VARCHAR(9) NOT NULL,
               `invoice` VARCHAR(255) NULL DEFAULT NULL,
@@ -326,7 +334,7 @@ class PayBear extends PaymentModule
               KEY `order_reference` (`order_reference`),
               KEY `blockchain` (`blockchain`),
               KEY `transaction_hash` (`transaction_hash`)
-        ) ENGINE = "._MYSQL_ENGINE_;
+        ) ENGINE = ' ._MYSQL_ENGINE_;
 
         foreach ($sql as $q) {
             if (!DB::getInstance()->execute($q)) {
@@ -339,7 +347,10 @@ class PayBear extends PaymentModule
 
     /**
      * Create order state
+     *
      * @return boolean
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function installOrderState()
     {
