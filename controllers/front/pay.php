@@ -64,6 +64,8 @@ class PayBearPayModuleFrontController extends ModuleFrontController
             $redirectTo = 'index.php?controller=order-confirmation&id_cart='.$order->id_cart.'&id_module='.$this->module->id.'&id_order='.$order->reference.'&key='.$customer->secure_key;
         }
 
+        $paybear_exchange_locktime = Configuration::get('PAYBEAR_EXCHANGE_LOCKTIME') * 60;
+
         $this->context->smarty->assign([
             'currencies' => $this->context->link->getModuleLink('paybear', 'currencies', array('order' => $orderReference)),
             'status' => $this->context->link->getModuleLink('paybear', 'status', array('order' => $orderReference)),
@@ -84,7 +86,8 @@ class PayBearPayModuleFrontController extends ModuleFrontController
             'paymentStatus' => $paymentStatus,
             'statusPaymentAccepted' => $statusPaymentAccepted,
             'statusWaitingForConfirmations' => $statusWaitingForConfirmations,
-            'statusMispaid' => $statusMispaid
+            'statusMispaid' => $statusMispaid,
+            'paybearExchangeLocktime' => $paybear_exchange_locktime
         ]);
 
         if ((float) _PS_VERSION_ < 1.7) {

@@ -15,6 +15,7 @@
              data-currency-sign="{$shopCurrency->sign}"
              data-min-overpayment-fiat="{$minOverpaymentFiat}"
              data-max-underpayment-fiat="{$maxUnderpaymentFiat}"
+             data-timer="{$paybearExchangeLocktime}"
              data-autoopen="true"
         >
             <div class="p30 PayBear-spinner" style="display: none;">
