@@ -12,7 +12,8 @@ $(function () {
         maxUnderpaymentFiat: $container.data('max-underpayment-fiat'),
         modal: true,
         enablePoweredBy: true,
-        redirectPendingTo: $container.data('redirect')
+        redirectPendingTo: $container.data('redirect'),
+        timer: $container.data('timer')
     });
 
     var autoopen = $container.data('autoopen');
